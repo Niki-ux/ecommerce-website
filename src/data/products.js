@@ -1,0 +1,38 @@
+export const products = [
+  {
+    id: 1,
+    title: "Wireless Over-Ear Headphones",
+    price: 99.99,
+    category: "Electronics",
+    description: "Comfortable over-ear headphones with deep bass and long battery life.",
+    image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600&auto=format&fit=crop&q=80",
+    rating: 4.5,
+  },
+  {
+    id: 2,
+    title: "Classic Minimalist Watch",
+    price: 149.5,
+    category: "Accessories",
+    description: "Elegant wrist watch with leather strap and water-resistant casing.",
+    image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600&auto=format&fit=crop&q=80",
+    rating: 4.8,
+  },
+  {
+    id: 3,
+    title: "Sport Running Shoes",
+    price: 79.99,
+    category: "Footwear",
+    description: "Lightweight and breathable running sneakers designed for daily training.",
+    image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&auto=format&fit=crop&q=80",
+    rating: 4.2,
+  },
+  {
+    id: 4,
+    title: "Mechanical Gaming Keyboard",
+    price: 89.0,
+    category: "Electronics",
+    description: "RGB mechanical keyboard featuring tactile brown switches and ergonomic design.",
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=600&auto=format&fit=crop&q=80",
+    rating: 4.6,
+  },
+];
