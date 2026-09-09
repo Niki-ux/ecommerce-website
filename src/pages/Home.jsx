@@ -1,18 +1,37 @@
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
+import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <>
-      <Navbar />
+    <main>
+      <section className="hero">
+        <div className="hero-content">
 
-      <main>
-        <h1>Home Page</h1>
-        <p>Welcome to our e-commerce website.</p>
-      </main>
+          <div className="hero-text">
 
-      <Footer />
-    </>
+            <span className="hero-label">
+              WELCOME TO ZOVA
+            </span>
+
+            <h1>
+              Shop what you love.
+              <br />
+              <span>Love what you buy.</span>
+            </h1>
+
+            <p>
+              Discover products for your everyday life,
+              all in one place.
+            </p>
+
+            <Link to="/products" className="hero-button">
+              Shop Now →
+            </Link>
+
+          </div>
+
+        </div>
+      </section>
+    </main>
   );
 }
 

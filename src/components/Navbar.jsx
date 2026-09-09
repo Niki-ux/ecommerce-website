@@ -1,14 +1,32 @@
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
+import logo from "../assets/zova-logo.svg";
 
 function Navbar() {
   return (
-    <nav>
-      <h2>E-Commerce</h2>
+    <nav className="navbar">
+      <div className="nav-container">
 
-      <div>
-        <Link to="/">Home</Link>
-        <Link to="/products">Products</Link>
-        <Link to="/cart">Cart</Link>
+        <NavLink to="/" className="logo">
+          <img src={logo} alt="ZOVA" />
+        </NavLink>
+
+        <div className="nav-links">
+          <NavLink to="/">Home</NavLink>
+          <NavLink to="/products">Products</NavLink>
+        </div>
+
+        <div className="search-box">
+          <span>⌕</span>
+          <input
+            type="text"
+            placeholder="Search products..."
+          />
+        </div>
+
+        <NavLink to="/cart" className="cart-button">
+          🛒 Cart
+        </NavLink>
+
       </div>
     </nav>
   );
