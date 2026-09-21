@@ -112,7 +112,7 @@ function Cart() {
             <h3>{item.title}</h3>
 
             <p>
-              Price: <strong>${item.price}</strong>
+              Price: <strong>₹{item.price}</strong>
             </p>
 
             {/* Quantity */}
@@ -161,7 +161,7 @@ function Cart() {
           textAlign: "right",
         }}
       >
-        <h2>Total: ${total.toFixed(2)}</h2>
+        <h2>Total: ₹{total.toFixed(2)}</h2>
 
         <button
           onClick={clearCart}

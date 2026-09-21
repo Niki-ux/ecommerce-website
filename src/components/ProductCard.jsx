@@ -78,7 +78,7 @@ export default function ProductCard({ product }) {
           color: '#16a34a'
         }}
       >
-        ${product.price}
+        ₹{product.price}
       </p>
 
       <button

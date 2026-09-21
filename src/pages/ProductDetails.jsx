@@ -115,7 +115,7 @@ export default function ProductDetails() {
               margin: "12px 0 20px"
             }}
           >
-            ${item.price.toFixed(2)}
+            ₹{item.price.toFixed(2)}
           </p>
 
           <p
