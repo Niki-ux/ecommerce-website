@@ -6,7 +6,6 @@ function Home() {
 
       <section className="hero-banner">
 
-        {/* LEFT TEXT */}
         <div className="hero-content">
 
           <p className="hero-small">
@@ -31,33 +30,6 @@ function Home() {
             Shop now
             <span>→</span>
           </Link>
-
-        </div>
-
-
-        {/* OFFER CONTENT */}
-        <div className="hero-offer">
-
-          <p>NEW ARRIVALS</p>
-
-          <h2>
-            JUST
-            <br />
-            FOR
-          </h2>
-
-          <div className="hero-your">
-            your
-          </div>
-
-          <div className="hero-order">
-            <strong>FOR ONLINE</strong>
-            <span>ORDER</span>
-          </div>
-
-          <div className="hero-discount">
-            30% OFF
-          </div>
 
         </div>
 
