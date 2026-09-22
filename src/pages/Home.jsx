@@ -60,7 +60,7 @@ function Home() {
             <div className="image-circle"></div>
 
             <img
-              src="/landing-model.png"
+              src="/shopping.png"
               alt="Fashion shopping"
             />
 
