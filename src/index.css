@@ -1,573 +1,266 @@
 /* =========================================
-   NEW LANDING PAGE
+   ZOVA NEW HOME PAGE
 ========================================= */
 
-.landing-page {
-  min-height: 100vh;
-  background: #f3c9a9;
-  padding: 24px 20px 40px;
-
-  font-family: Arial, Helvetica, sans-serif;
+.home-page {
+  width: 100%;
+  background: #fff8f2;
 }
 
 
-/* PAGE TITLE */
+/* HERO */
 
-.landing-title {
-  text-align: center;
-  margin-bottom: 24px;
-}
-
-.landing-title h1 {
-  font-size: 18px;
-  font-weight: 700;
-  color: #111;
-  margin-bottom: 3px;
-}
-
-.landing-title p {
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-}
-
-
-/* MAIN WHITE SHOPPING CARD */
-
-.shopping-banner {
-  width: min(100%, 1050px);
-  margin: 0 auto;
-
-  background: #fffaf5;
-
-  min-height: 610px;
-
-  position: relative;
-  overflow: hidden;
-
-  box-shadow:
-    0 15px 35px rgba(0, 0, 0, 0.12);
-}
-
-
-/* =========================================
-   NAVBAR
-========================================= */
-
-.landing-navbar {
-  height: 65px;
-
-  display: flex;
-  align-items: center;
-
-  padding: 0 25px;
-
-  border-bottom: 1px solid #eeeeee;
-
-  background: #fffaf5;
-}
-
-
-/* LOGO */
-
-.store-logo {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  width: 180px;
-
-  text-decoration: none;
-  color: #111;
-}
-
-.cart-symbol {
-  font-size: 28px;
-}
-
-.store-logo div {
-  display: flex;
-  flex-direction: column;
-}
-
-.store-logo strong {
-  font-size: 13px;
-  letter-spacing: 0.5px;
-}
-
-.store-logo span {
-  font-family: Georgia, serif;
-  font-size: 20px;
-  color: #e28d49;
-  line-height: 16px;
-}
-
-
-/* NAV LINKS */
-
-.landing-nav-links {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  gap: 30px;
-
-  flex: 1;
-}
-
-.landing-nav-links a {
-  text-decoration: none;
-
-  font-size: 9px;
-  font-weight: 700;
-
-  letter-spacing: 1px;
-
-  color: #333;
-
-  transition: 0.2s;
-}
-
-.landing-nav-links a:hover,
-.landing-nav-links a.active {
-  color: #e28d49;
-}
-
-
-/* CALL NOW */
-
-.call-us {
-  width: 150px;
-
-  display: flex;
-  flex-direction: column;
-
-  text-align: right;
-}
-
-.call-us span {
-  font-size: 9px;
-  font-weight: 700;
-
-  color: #333;
-}
-
-.call-us strong {
-  font-size: 11px;
-  color: #111;
-}
-
-
-/* =========================================
-   HERO
-========================================= */
-
-.shopping-hero {
-  min-height: 490px;
+.fashion-hero {
+  width: 100%;
+  min-height: 650px;
 
   display: grid;
+  grid-template-columns: 52% 48%;
 
-  grid-template-columns: 55% 45%;
+  background: #fff8f2;
 
-  position: relative;
+  overflow: hidden;
 }
 
 
 /* =========================================
-   LEFT IMAGE
+   GIRL IMAGE
 ========================================= */
 
-.shopping-image {
+.fashion-image {
   position: relative;
+
+  min-height: 650px;
 
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   justify-content: center;
 
+  background: #f2c19e;
+
   overflow: hidden;
-
-  background: #fff5ee;
 }
 
+.fashion-image img {
+  width: 100%;
+  height: 100%;
 
-/* BIG CIRCLE */
-
-.image-circle {
-  position: absolute;
-
-  width: 330px;
-  height: 330px;
-
-  border-radius: 50%;
-
-  background: #f2c29f;
-
-  left: 50%;
-  top: 48%;
-
-  transform: translate(-50%, -50%);
-}
-
-
-/* MODEL */
-
-.shopping-image img {
-  position: relative;
-  z-index: 2;
-
-  width: 75%;
-  max-width: 390px;
-
-  height: 440px;
-
-  object-fit: contain;
-  object-position: center bottom;
+  object-fit: cover;
 
   display: block;
 }
 
 
 /* =========================================
-   OFFER SIDE
+   RIGHT SIDE
 ========================================= */
 
-.shopping-offer {
-  padding: 75px 30px 30px;
+.fashion-content {
+  position: relative;
+
+  min-height: 650px;
+
+  padding: 75px 65px;
+
+  background: #fff8f2;
 
   display: flex;
   flex-direction: column;
-
-  align-items: center;
-
-  text-align: center;
-
-  position: relative;
+  align-items: flex-start;
 }
 
 
 /* NEW ARRIVALS */
 
 .new-arrivals {
-  font-size: 17px;
+  margin: 0 0 12px 5px;
 
-  letter-spacing: 2px;
+  font-size: 22px;
+
+  font-weight: 400;
+
+  letter-spacing: 3px;
 
   color: #777;
-
-  margin-bottom: 5px;
 }
 
 
 /* JUST FOR */
 
-.shopping-offer h2 {
+.fashion-content h1 {
   margin: 0;
 
-  font-size: clamp(50px, 6vw, 78px);
+  font-family: Arial, Helvetica, sans-serif;
 
-  line-height: 0.82;
+  font-size: clamp(75px, 8vw, 120px);
+
+  line-height: 0.78;
 
   font-weight: 900;
 
-  letter-spacing: -4px;
+  letter-spacing: -6px;
 
-  color: #000;
+  color: #050505;
 }
 
 
-/* ORANGE YOUR */
+/* YOUR */
 
-.shopping-offer h2 span {
-  display: inline-block;
+.your-text {
+  margin-top: 18px;
+
+  margin-left: 60px;
 
   font-family: Georgia, "Times New Roman", serif;
 
+  font-size: 75px;
+
+  line-height: 0.8;
+
+  font-weight: 600;
+
   font-style: italic;
 
-  font-weight: 500;
+  color: #df8745;
 
-  color: #e38c49;
-
-  font-size: 0.72em;
-
-  transform: rotate(-8deg);
-
-  margin-left: 20px;
-
-  margin-top: -8px;
+  transform: rotate(-7deg);
 }
 
 
-/* ONLINE ORDER */
+/* FOR ONLINE ORDER */
 
-.order-offer {
-  margin-top: 28px;
+.online-order {
+  margin-top: 35px;
+
+  margin-left: 5px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+
+  padding: 10px 18px;
 
   background: #111;
 
   color: white;
-
-  padding: 7px 13px;
-
-  display: flex;
-  align-items: center;
-
-  gap: 7px;
 }
 
-.order-offer strong {
-  font-size: 12px;
+.online-order strong {
+  font-size: 15px;
 }
 
-.order-offer span {
-  font-size: 11px;
+.online-order span {
+  font-size: 15px;
 }
 
 
-/* DISCOUNT */
+/* 30% OFF */
 
-.discount {
+.discount-badge {
   position: absolute;
 
-  right: 25px;
-  bottom: 85px;
+  right: 45px;
 
-  background: #f2c29f;
+  bottom: 130px;
+
+  padding: 14px 20px;
+
+  background: #f2bd94;
 
   color: #111;
 
-  font-size: 25px;
+  font-size: 28px;
 
   font-weight: 800;
+}
 
-  padding: 6px 10px;
+
+/* SHOP NOW */
+
+.shop-now {
+  margin-top: 30px;
+
+  padding: 12px 22px;
+
+  background: #df8745;
+
+  color: white;
+
+  text-decoration: none;
+
+  font-size: 13px;
+
+  font-weight: 700;
+
+  letter-spacing: 1px;
+}
+
+.shop-now:hover {
+  background: #c96f2e;
 }
 
 
 /* =========================================
-   FOOTER
+   MOBILE
 ========================================= */
 
-.landing-footer {
-  position: absolute;
+@media (max-width: 700px) {
 
-  bottom: 12px;
-  left: 25px;
-  right: 25px;
+  .fashion-hero {
+    display: flex;
 
-  display: flex;
-
-  justify-content: space-between;
-  align-items: center;
-
-  color: #999;
-
-  font-size: 8px;
-}
-
-.social-icons {
-  display: flex;
-  gap: 12px;
-
-  color: #e28d49;
-
-  font-size: 12px;
-}
-
-
-/* =========================================
-   RESPONSIVE
-========================================= */
-
-@media (max-width: 800px) {
-
-  .landing-page {
-    padding: 15px;
+    flex-direction: column;
   }
 
-  .landing-navbar {
-    height: auto;
-
-    padding: 15px;
-
-    flex-wrap: wrap;
-
-    gap: 15px;
-  }
-
-  .store-logo {
-    width: auto;
-  }
-
-  .landing-nav-links {
-    order: 3;
-
+  .fashion-image {
     width: 100%;
 
-    gap: 15px;
+    height: 430px;
 
-    justify-content: center;
+    min-height: 430px;
   }
 
-  .call-us {
-    margin-left: auto;
+  .fashion-content {
+    min-height: 550px;
+
+    padding: 50px 25px;
+
+    align-items: center;
+
+    text-align: center;
   }
 
-  .shopping-hero {
-    grid-template-columns: 1fr;
+  .new-arrivals {
+    margin-left: 0;
 
-    min-height: auto;
+    font-size: 17px;
   }
 
-  .shopping-image {
-    min-height: 350px;
+  .fashion-content h1 {
+    font-size: 75px;
   }
 
-  .shopping-image img {
-    height: 330px;
+  .your-text {
+    margin-left: 20px;
+
+    font-size: 60px;
   }
 
-  .shopping-offer {
-    min-height: 350px;
-
-    padding-top: 45px;
+  .online-order {
+    margin-left: 0;
   }
 
-  .discount {
-    bottom: 50px;
+  .discount-badge {
+    position: static;
+
+    margin-top: 25px;
+
+    font-size: 22px;
   }
 
-  .landing-footer {
-    position: relative;
-
-    margin-top: 20px;
-
-    bottom: auto;
-    left: auto;
-    right: auto;
-  }
-}
-
-
-@media (max-width: 500px) {
-
-  .landing-title h1 {
-    font-size: 16px;
-  }
-
-  .shopping-banner {
-    min-height: auto;
-  }
-
-  .landing-navbar {
-    justify-content: center;
-  }
-
-  .store-logo {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .call-us {
-    display: none;
-  }
-
-  .landing-nav-links {
-    gap: 12px;
-  }
-
-  .landing-nav-links a {
-    font-size: 8px;
-  }
-
-  .shopping-image {
-    min-height: 300px;
-  }
-
-  .shopping-image img {
-    width: 85%;
-    height: 300px;
-  }
-
-  .image-circle {
-    width: 240px;
-    height: 240px;
-  }
-
-  .shopping-offer {
-    min-height: 320px;
-  }
-
-  .shopping-offer h2 {
-    font-size: 58px;
-  }
-
-  .discount {
-    right: 15px;
-    bottom: 40px;
-    font-size: 18px;
+  .shop-now {
+    margin-top: 25px;
   }
 }
-
-
-import { Link } from "react-router-dom";
-
-function Home() {
-  return (
-    <main className="home-page">
-
-      {/* HERO SECTION */}
-      <section className="fashion-hero">
-
-        {/* LEFT - SHOPPING GIRL */}
-        <div className="fashion-image">
-
-          <div className="fashion-circle"></div>
-
-          <img
-            src="/landing-model.png"
-            alt="Fashion shopping"
-          />
-
-        </div>
-
-
-        {/* RIGHT - TEXT */}
-        <div className="fashion-content">
-
-          <p className="new-arrivals">
-            NEW ARRIVALS
-          </p>
-
-          <h1>
-            JUST
-            <br />
-            FOR
-          </h1>
-
-          <div className="your-text">
-            your
-          </div>
-
-          <div className="online-order">
-            <strong>FOR ONLINE</strong>
-            <span>ORDER</span>
-          </div>
-
-          <div className="discount-badge">
-            30% OFF
-          </div>
-
-          <Link to="/products" className="shop-now">
-            SHOP NOW →
-          </Link>
-
-        </div>
-
-      </section>
-
-    </main>
-  );
-}
-
-export default Home;
