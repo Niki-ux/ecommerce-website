@@ -2,113 +2,53 @@ import { Link } from "react-router-dom";
 
 function Home() {
   return (
-    <main className="landing-page">
+    <main className="home-page">
 
-      {/* PAGE TITLE */}
-      <div className="landing-title">
-        <h1>LANDING PAGE</h1>
-        <p>Online Shopping</p>
-      </div>
+      {/* HERO SECTION */}
+      <section className="fashion-hero">
 
-      {/* MAIN SHOPPING BANNER */}
-      <section className="shopping-banner">
+        {/* LEFT - SHOPPING GIRL */}
+        <div className="fashion-image">
 
-        {/* TOP NAVIGATION */}
-        <nav className="landing-navbar">
+          <div className="fashion-circle"></div>
 
-          <Link to="/" className="store-logo">
-            <span className="cart-symbol">🛒</span>
-
-            <div>
-              <strong>ONLINE</strong>
-              <span>Store</span>
-            </div>
-          </Link>
-
-          <div className="landing-nav-links">
-            <Link to="/" className="active">
-              HOME
-            </Link>
-
-            <Link to="/products">
-              PRODUCTS
-            </Link>
-
-            <Link to="/products">
-              ABOUT
-            </Link>
-
-            <Link to="/cart">
-              CONTACT
-            </Link>
-          </div>
-
-          <div className="call-us">
-            <span>CALL NOW</span>
-            <strong>1800 888 555</strong>
-          </div>
-
-        </nav>
-
-
-        {/* HERO CONTENT */}
-        <div className="shopping-hero">
-
-          {/* LEFT SIDE - IMAGE */}
-          <div className="shopping-image">
-
-            <div className="image-circle"></div>
-
-            <img
-              src="/shopping.png"
-              alt="Fashion shopping"
-            />
-
-          </div>
-
-
-          {/* RIGHT SIDE - OFFER */}
-          <div className="shopping-offer">
-
-            <p className="new-arrivals">
-              NEW ARRIVALS
-            </p>
-
-            <h2>
-              JUST
-              <br />
-              FOR
-              <br />
-              <span>your</span>
-            </h2>
-
-            <div className="order-offer">
-              <strong>FOR ONLINE</strong>
-              <span>ORDER</span>
-            </div>
-
-            <div className="discount">
-              30% OFF
-            </div>
-
-          </div>
+          <img
+            src="/landing-model.png"
+            alt="Fashion shopping"
+          />
 
         </div>
 
 
-        {/* BOTTOM */}
-        <div className="landing-footer">
+        {/* RIGHT - TEXT */}
+        <div className="fashion-content">
 
-          <span>
-            © Company Name 2026. All rights reserved.
-          </span>
+          <p className="new-arrivals">
+            NEW ARRIVALS
+          </p>
 
-          <div className="social-icons">
-            <span>◎</span>
-            <span>f</span>
-            <span>𝕏</span>
-            <span>◉</span>
+          <h1>
+            JUST
+            <br />
+            FOR
+          </h1>
+
+          <div className="your-text">
+            your
           </div>
+
+          <div className="online-order">
+            <strong>FOR ONLINE</strong>
+            <span>ORDER</span>
+          </div>
+
+          <div className="discount-badge">
+            30% OFF
+          </div>
+
+          <Link to="/products" className="shop-now">
+            SHOP NOW →
+          </Link>
 
         </div>
 
