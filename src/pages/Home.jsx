@@ -3,25 +3,33 @@ import { Link } from "react-router-dom";
 function Home() {
   return (
     <main className="home-page">
-      <section className="hero-banner">
-        <div className="hero-content">
-          <p className="hero-small">WELCOME TO ZOVA</p>
+      <section className="simple-hero">
 
-          <h1>
-            Made for
-            <br />
-            <span>everyday.</span>
-          </h1>
+        <div className="arrival-content">
 
-          <p className="hero-description">
-            Discover fashion and lifestyle products
-            made for your everyday moments.
+          <p className="arrival-label">
+            NEW ARRIVALS
           </p>
 
-          <Link to="/products" className="hero-button">
-            Shop now <span>→</span>
+          <h1>
+            JUST <span>FOR</span>{" "}
+            <em>you</em>
+          </h1>
+
+          <div className="discount-sticker">
+            <strong>30% OFF</strong>
+            <small>ONLINE ORDER</small>
+          </div>
+
+          <Link
+            to="/products"
+            className="arrival-button"
+          >
+            SHOP NOW →
           </Link>
+
         </div>
+
       </section>
     </main>
   );
