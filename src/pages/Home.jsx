@@ -1,88 +1,114 @@
 import { Link } from "react-router-dom";
-import { products } from "../data/products";
 
 function Home() {
-  const featuredProducts = products.slice(0, 3);
-
   return (
-    <main>
+    <main className="landing-page">
 
-      {/* HERO */}
+      {/* PAGE TITLE */}
+      <div className="landing-title">
+        <h1>LANDING PAGE</h1>
+        <p>Online Shopping</p>
+      </div>
 
-      <section className="hero">
+      {/* MAIN SHOPPING BANNER */}
+      <section className="shopping-banner">
 
-        <div className="hero-content">
+        {/* TOP NAVIGATION */}
+        <nav className="landing-navbar">
 
-          <div className="hero-text">
+          <Link to="/" className="store-logo">
+            <span className="cart-symbol">🛒</span>
 
-            <p className="hero-label">
-              WELCOME TO ZOVA
+            <div>
+              <strong>ONLINE</strong>
+              <span>Store</span>
+            </div>
+          </Link>
+
+          <div className="landing-nav-links">
+            <Link to="/" className="active">
+              HOME
+            </Link>
+
+            <Link to="/products">
+              PRODUCTS
+            </Link>
+
+            <Link to="/products">
+              ABOUT
+            </Link>
+
+            <Link to="/cart">
+              CONTACT
+            </Link>
+          </div>
+
+          <div className="call-us">
+            <span>CALL NOW</span>
+            <strong>1800 888 555</strong>
+          </div>
+
+        </nav>
+
+
+        {/* HERO CONTENT */}
+        <div className="shopping-hero">
+
+          {/* LEFT SIDE - IMAGE */}
+          <div className="shopping-image">
+
+            <div className="image-circle"></div>
+
+            <img
+              src="/landing-model.png"
+              alt="Fashion shopping"
+            />
+
+          </div>
+
+
+          {/* RIGHT SIDE - OFFER */}
+          <div className="shopping-offer">
+
+            <p className="new-arrivals">
+              NEW ARRIVALS
             </p>
 
-            <h1>
-              Made for
+            <h2>
+              JUST
               <br />
-              <span>everyday.</span>
-            </h1>
+              FOR
+              <br />
+              <span>your</span>
+            </h2>
 
-            <Link to="/products" className="hero-button">
-              Shop now <span>→</span>
-            </Link>
+            <div className="order-offer">
+              <strong>FOR ONLINE</strong>
+              <span>ORDER</span>
+            </div>
+
+            <div className="discount">
+              30% OFF
+            </div>
 
           </div>
 
         </div>
 
-      </section>
 
+        {/* BOTTOM */}
+        <div className="landing-footer">
 
-      {/* ZOVA EDIT */}
+          <span>
+            © Company Name 2026. All rights reserved.
+          </span>
 
-      <section className="zova-edit">
-
-        <div className="edit-heading">
-          <p>THE ZOVA EDIT</p>
-
-          <h2>
-            A little something
-            <br />
-            for everyone.
-          </h2>
-
-          <Link to="/products">
-            Explore collection →
-          </Link>
-        </div>
-
-
-        <div className="edit-products">
-
-          {featuredProducts.map((product) => (
-            <Link
-              to={`/products/${product.id}`}
-              className="edit-product"
-              key={product.id}
-            >
-
-              <div className="edit-product-image">
-
-                <img
-                  src={product.image}
-                  alt={product.title}
-                />
-
-              </div>
-
-              <div className="edit-product-info">
-
-                <h3>{product.title}</h3>
-
-                <p>{product.category}</p>
-
-              </div>
-
-            </Link>
-          ))}
+          <div className="social-icons">
+            <span>◎</span>
+            <span>f</span>
+            <span>𝕏</span>
+            <span>◉</span>
+          </div>
 
         </div>
 
