@@ -1,11 +1,20 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { FaRegHeart, FaHeart } from "react-icons/fa";
 
 export default function ProductCard({ product }) {
+  const [isWishlisted, setIsWishlisted] = useState(() => {
+    const wishlist =
+      JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    return wishlist.some(
+      (item) => item.id === product.id
+    );
+  });
 
   const addToCart = () => {
     const existingCart =
-      JSON.parse(localStorage.getItem('cart')) || [];
+      JSON.parse(localStorage.getItem("cart")) || [];
 
     const existingProduct = existingCart.find(
       (item) => item.id === product.id
@@ -33,49 +42,84 @@ export default function ProductCard({ product }) {
     }
 
     localStorage.setItem(
-      'cart',
+      "cart",
       JSON.stringify(updatedCart)
     );
 
     alert(`${product.title} added to cart!`);
   };
 
+  const toggleWishlist = () => {
+    const wishlist =
+      JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    const alreadyExists = wishlist.some(
+      (item) => item.id === product.id
+    );
+
+    let updatedWishlist;
+
+    if (alreadyExists) {
+      updatedWishlist = wishlist.filter(
+        (item) => item.id !== product.id
+      );
+
+      setIsWishlisted(false);
+    } else {
+      updatedWishlist = [
+        ...wishlist,
+        product
+      ];
+
+      setIsWishlisted(true);
+    }
+
+    localStorage.setItem(
+      "wishlist",
+      JSON.stringify(updatedWishlist)
+    );
+
+    window.dispatchEvent(
+      new Event("wishlistUpdated")
+    );
+  };
+
   return (
-    <div
-      style={{
-        border: '1px solid #ddd',
-        borderRadius: '10px',
-        padding: '15px',
-        background: '#fff'
-      }}
-    >
+    <div className="product-card">
+      <div className="product-image-wrapper">
+        <Link to={`/product/${product.id}`}>
+          <img
+            src={product.image}
+            alt={product.title}
+            className="product-image"
+          />
+        </Link>
+
+        <button
+          className="wishlist-button"
+          onClick={toggleWishlist}
+          aria-label="Wishlist"
+        >
+          {isWishlisted ? (
+            <FaHeart />
+          ) : (
+            <FaRegHeart />
+          )}
+        </button>
+      </div>
 
       <Link
         to={`/product/${product.id}`}
-        style={{
-          textDecoration: 'none',
-          color: 'inherit'
-        }}
+        className="product-title"
       >
-        <img
-          src={product.image}
-          alt={product.title}
-          style={{
-            width: '100%',
-            height: '220px',
-            objectFit: 'cover',
-            borderRadius: '8px'
-          }}
-        />
-
         <h3>{product.title}</h3>
       </Link>
 
       <p
         style={{
-          fontSize: '20px',
-          fontWeight: 'bold',
-          color: '#16a34a'
+          fontSize: "20px",
+          fontWeight: "bold",
+          color: "#16a34a"
         }}
       >
         ₹{product.price}
@@ -83,20 +127,10 @@ export default function ProductCard({ product }) {
 
       <button
         onClick={addToCart}
-        style={{
-          width: '100%',
-          padding: '12px',
-          background: '#2563eb',
-          color: 'white',
-          border: 'none',
-          borderRadius: '6px',
-          cursor: 'pointer',
-          fontWeight: 'bold'
-        }}
+        className="add-cart-button"
       >
         Add to Cart
       </button>
-
     </div>
   );
 }
