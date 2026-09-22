@@ -4,23 +4,17 @@ function Home() {
   return (
     <main className="home-page">
 
-      {/* HERO SECTION */}
       <section className="fashion-hero">
 
-        {/* LEFT - SHOPPING GIRL */}
+        {/* GIRL */}
         <div className="fashion-image">
-
-          <div className="fashion-circle"></div>
-
           <img
             src="/landing-model.png"
             alt="Fashion shopping"
           />
-
         </div>
 
-
-        {/* RIGHT - TEXT */}
+        {/* TEXT */}
         <div className="fashion-content">
 
           <p className="new-arrivals">
@@ -46,7 +40,10 @@ function Home() {
             30% OFF
           </div>
 
-          <Link to="/products" className="shop-now">
+          <Link
+            to="/products"
+            className="shop-now"
+          >
             SHOP NOW →
           </Link>
 
