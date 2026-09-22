@@ -3,14 +3,9 @@ import { Link } from "react-router-dom";
 function Home() {
   return (
     <main className="home-page">
-
       <section className="hero-banner">
-
         <div className="hero-content">
-
-          <p className="hero-small">
-            WELCOME TO ZOVA
-          </p>
+          <p className="hero-small">WELCOME TO ZOVA</p>
 
           <h1>
             Made for
@@ -23,18 +18,11 @@ function Home() {
             made for your everyday moments.
           </p>
 
-          <Link
-            to="/products"
-            className="hero-button"
-          >
-            Shop now
-            <span>→</span>
+          <Link to="/products" className="hero-button">
+            Shop now <span>→</span>
           </Link>
-
         </div>
-
       </section>
-
     </main>
   );
 }
