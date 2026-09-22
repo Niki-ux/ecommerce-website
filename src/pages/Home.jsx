@@ -4,48 +4,60 @@ function Home() {
   return (
     <main className="home-page">
 
-      <section className="fashion-hero">
+      <section className="hero-banner">
 
-        {/* GIRL */}
-        <div className="fashion-image">
-          <img
-            src="/landing-model.png"
-            alt="Fashion shopping"
-          />
-        </div>
+        {/* LEFT TEXT */}
+        <div className="hero-content">
 
-        {/* TEXT */}
-        <div className="fashion-content">
-
-          <p className="new-arrivals">
-            NEW ARRIVALS
+          <p className="hero-small">
+            WELCOME TO ZOVA
           </p>
 
           <h1>
+            Made for
+            <br />
+            <span>everyday.</span>
+          </h1>
+
+          <p className="hero-description">
+            Discover fashion and lifestyle products
+            made for your everyday moments.
+          </p>
+
+          <Link
+            to="/products"
+            className="hero-button"
+          >
+            Shop now
+            <span>→</span>
+          </Link>
+
+        </div>
+
+
+        {/* OFFER CONTENT */}
+        <div className="hero-offer">
+
+          <p>NEW ARRIVALS</p>
+
+          <h2>
             JUST
             <br />
             FOR
-          </h1>
+          </h2>
 
-          <div className="your-text">
+          <div className="hero-your">
             your
           </div>
 
-          <div className="online-order">
+          <div className="hero-order">
             <strong>FOR ONLINE</strong>
             <span>ORDER</span>
           </div>
 
-          <div className="discount-badge">
+          <div className="hero-discount">
             30% OFF
           </div>
-
-          <Link
-            to="/products"
-            className="shop-now"
-          >
-            SHOP NOW →
-          </Link>
 
         </div>
 
