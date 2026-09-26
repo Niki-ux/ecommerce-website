@@ -1,30 +1,32 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-function Login() {
+function Signup() {
   const navigate = useNavigate();
 
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please enter your email and password.");
+    if (!name || !email || !password) {
+      alert("Please fill all fields.");
       return;
     }
 
     try {
       setLoading(true);
 
-      const response = await fetch("http://localhost:5000/api/auth/login", {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
+          name,
           email,
           password,
         }),
@@ -33,7 +35,7 @@ function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Login failed.");
+        alert(data.message || "Registration failed.");
         return;
       }
 
@@ -41,7 +43,7 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(data.user));
       window.dispatchEvent(new Event("authUpdated"));
 
-      alert("Login successful!");
+      alert("Account created successfully!");
 
       navigate("/");
     } catch (error) {
@@ -56,19 +58,30 @@ function Login() {
       <div className="login-container">
 
         <div className="login-heading">
-          <p>WELCOME BACK</p>
+          <p>WELCOME TO ZOVA</p>
 
-          <h1>Login</h1>
+          <h1>Sign Up</h1>
 
           <span>
-            Sign in to continue to ZOVA.
+            Create your account to get started.
           </span>
         </div>
 
         <form
           className="login-form"
-          onSubmit={handleLogin}
+          onSubmit={handleSignup}
         >
+          <div className="form-group">
+            <label>Name</label>
+
+            <input
+              type="text"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </div>
+
           <div className="form-group">
             <label>Email</label>
 
@@ -85,7 +98,7 @@ function Login() {
 
             <input
               type="password"
-              placeholder="Enter your password"
+              placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
@@ -96,14 +109,14 @@ function Login() {
             className="login-button"
             disabled={loading}
           >
-            {loading ? "Logging in..." : "Login"}
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
         <p className="login-footer">
-          Don't have an account?{" "}
-          <Link to="/signup">
-            Sign up
+          Already have an account?{" "}
+          <Link to="/login">
+            Login
           </Link>
         </p>
 
@@ -112,4 +125,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default Signup;
