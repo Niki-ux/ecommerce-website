@@ -3,12 +3,14 @@ import { Link } from "react-router-dom";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
 
 export default function ProductCard({ product }) {
+  const productId = product._id || product.id;
+
   const [isWishlisted, setIsWishlisted] = useState(() => {
     const wishlist =
       JSON.parse(localStorage.getItem("wishlist")) || [];
 
     return wishlist.some(
-      (item) => item.id === product.id
+      (item) => (item._id || item.id) === productId
     );
   });
 
@@ -17,17 +19,17 @@ export default function ProductCard({ product }) {
       JSON.parse(localStorage.getItem("cart")) || [];
 
     const existingProduct = existingCart.find(
-      (item) => item.id === product.id
+      (item) => (item._id || item.id) === productId
     );
 
     let updatedCart;
 
     if (existingProduct) {
       updatedCart = existingCart.map((item) =>
-        item.id === product.id
+        (item._id || item.id) === productId
           ? {
               ...item,
-              quantity: item.quantity + 1
+              quantity: (item.quantity || 1) + 1,
             }
           : item
       );
@@ -36,8 +38,8 @@ export default function ProductCard({ product }) {
         ...existingCart,
         {
           ...product,
-          quantity: 1
-        }
+          quantity: 1,
+        },
       ];
     }
 
@@ -54,21 +56,21 @@ export default function ProductCard({ product }) {
       JSON.parse(localStorage.getItem("wishlist")) || [];
 
     const alreadyExists = wishlist.some(
-      (item) => item.id === product.id
+      (item) => (item._id || item.id) === productId
     );
 
     let updatedWishlist;
 
     if (alreadyExists) {
       updatedWishlist = wishlist.filter(
-        (item) => item.id !== product.id
+        (item) => (item._id || item.id) !== productId
       );
 
       setIsWishlisted(false);
     } else {
       updatedWishlist = [
         ...wishlist,
-        product
+        product,
       ];
 
       setIsWishlisted(true);
@@ -87,7 +89,7 @@ export default function ProductCard({ product }) {
   return (
     <div className="product-card">
       <div className="product-image-wrapper">
-        <Link to={`/product/${product.id}`}>
+        <Link to={`/product/${productId}`}>
           <img
             src={product.image}
             alt={product.title}
@@ -96,6 +98,7 @@ export default function ProductCard({ product }) {
         </Link>
 
         <button
+          type="button"
           className="wishlist-button"
           onClick={toggleWishlist}
           aria-label="Wishlist"
@@ -109,7 +112,7 @@ export default function ProductCard({ product }) {
       </div>
 
       <Link
-        to={`/product/${product.id}`}
+        to={`/product/${productId}`}
         className="product-title"
       >
         <h3>{product.title}</h3>
@@ -119,13 +122,14 @@ export default function ProductCard({ product }) {
         style={{
           fontSize: "20px",
           fontWeight: "bold",
-          color: "#16a34a"
+          color: "#16a34a",
         }}
       >
         ₹{product.price}
       </p>
 
       <button
+        type="button"
         onClick={addToCart}
         className="add-cart-button"
       >
