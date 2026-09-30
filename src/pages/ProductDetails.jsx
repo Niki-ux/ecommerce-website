@@ -3,25 +3,29 @@ import { useParams, Link } from "react-router-dom";
 
 export default function ProductDetails() {
   const { id } = useParams();
+
   const [quantity, setQuantity] = useState(1);
-  
-  // --- NEW API STATE ---
   const [item, setItem] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // --- NEW FETCH LOGIC ---
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`/api/products/${id}`);
-        if (!response.ok) throw new Error('Product not found');
-        
+        const response = await fetch(
+          `http://localhost:5000/api/products/${id}`
+        );
+
+        if (!response.ok) {
+          throw new Error("Product not found");
+        }
+
         const data = await response.json();
+
         setItem(data);
-        setLoading(false);
       } catch (err) {
         setError(err.message);
+      } finally {
         setLoading(false);
       }
     };
@@ -30,48 +34,106 @@ export default function ProductDetails() {
   }, [id]);
 
   if (loading) {
-    return <div style={{ textAlign: "center", padding: "80px 20px" }}><h2>Loading Details...</h2></div>;
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          padding: "80px 20px",
+        }}
+      >
+        <h2>Loading Details...</h2>
+      </div>
+    );
   }
 
   if (error) {
-    return <div style={{ textAlign: "center", padding: "80px 20px" }}><h2>Error: {error}</h2></div>;
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          padding: "80px 20px",
+        }}
+      >
+        <h2>Error: {error}</h2>
+      </div>
+    );
   }
 
   if (!item) {
     return (
-      <div style={{ textAlign: "center", padding: "80px 20px" }}>
+      <div
+        style={{
+          textAlign: "center",
+          padding: "80px 20px",
+        }}
+      >
         <h2>Product not found</h2>
-        <Link to="/products" style={{ color: "#b8892d", fontWeight: "600" }}>
+
+        <Link
+          to="/products"
+          style={{
+            color: "#b8892d",
+            fontWeight: "600",
+          }}
+        >
           Back to catalog
         </Link>
       </div>
     );
   }
 
-  // --- CART LOGIC (Left for Annu to connect to backend) ---
+  // Cart integration will be connected to the backend separately.
   const handleAddToCart = () => {
-    const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-    // Added fallback for MongoDB _id
+    const existingCart =
+      JSON.parse(localStorage.getItem("cart")) || [];
+
     const itemId = item._id || item.id;
-    const existingIndex = existingCart.findIndex((cartItem) => (cartItem._id || cartItem.id) === itemId);
+
+    const existingIndex = existingCart.findIndex(
+      (cartItem) =>
+        (cartItem._id || cartItem.id) === itemId
+    );
 
     let updatedCart;
+
     if (existingIndex > -1) {
       updatedCart = existingCart.map((cartItem) =>
         (cartItem._id || cartItem.id) === itemId
-          ? { ...cartItem, quantity: (cartItem.quantity || 1) + quantity }
+          ? {
+              ...cartItem,
+              quantity:
+                (cartItem.quantity || 1) + quantity,
+            }
           : cartItem
       );
     } else {
-      updatedCart = [...existingCart, { ...item, quantity }];
+      updatedCart = [
+        ...existingCart,
+        {
+          ...item,
+          quantity,
+        },
+      ];
     }
 
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-    alert(`Added ${quantity} × ${item.title} to your cart!`);
+    localStorage.setItem(
+      "cart",
+      JSON.stringify(updatedCart)
+    );
+
+    alert(
+      `Added ${quantity} × ${item.title} to your cart!`
+    );
   };
 
   return (
-    <div style={{ maxWidth: "1000px", margin: "40px auto", padding: "0 24px" }}>
+    <div
+      style={{
+        maxWidth: "1000px",
+        margin: "40px auto",
+        padding: "0 24px",
+      }}
+    >
       <Link
         to="/products"
         style={{
@@ -80,7 +142,7 @@ export default function ProductDetails() {
           color: "#50545b",
           textDecoration: "none",
           fontSize: "14px",
-          fontWeight: "500"
+          fontWeight: "500",
         }}
       >
         ← Back to products
@@ -94,11 +156,15 @@ export default function ProductDetails() {
           background: "#ffffff",
           padding: "36px",
           borderRadius: "12px",
-          border: "1px solid #e9e6df"
+          border: "1px solid #e9e6df",
         }}
       >
-        {/* Image Container */}
-        <div style={{ flex: "1 1 360px", maxWidth: "450px" }}>
+        <div
+          style={{
+            flex: "1 1 360px",
+            maxWidth: "450px",
+          }}
+        >
           <img
             src={item.image}
             alt={item.title}
@@ -106,20 +172,23 @@ export default function ProductDetails() {
               width: "100%",
               height: "400px",
               objectFit: "cover",
-              borderRadius: "8px"
+              borderRadius: "8px",
             }}
           />
         </div>
 
-        {/* Product Details */}
-        <div style={{ flex: "1 1 320px" }}>
+        <div
+          style={{
+            flex: "1 1 320px",
+          }}
+        >
           <span
             style={{
               fontSize: "11px",
               letterSpacing: "2px",
               textTransform: "uppercase",
               color: "#b8892d",
-              fontWeight: "700"
+              fontWeight: "700",
             }}
           >
             {item.category}
@@ -129,15 +198,26 @@ export default function ProductDetails() {
             style={{
               margin: "10px 0 8px",
               fontSize: "32px",
-              fontFamily: 'Georgia, "Times New Roman", serif',
-              color: "#17233f"
+              fontFamily:
+                'Georgia, "Times New Roman", serif',
+              color: "#17233f",
             }}
           >
             {item.title}
           </h1>
 
-          <div style={{ color: "#d6ad35", fontSize: "14px", marginBottom: "16px" }}>
-            {"★".repeat(Math.floor(item.rating || 0))} ({item.rating || 0} / 5.0) · {item.reviewsCount || 0} reviews
+          <div
+            style={{
+              color: "#d6ad35",
+              fontSize: "14px",
+              marginBottom: "16px",
+            }}
+          >
+            {"★".repeat(
+              Math.floor(item.rating || 0)
+            )}{" "}
+            ({item.rating || 0} / 5.0) ·{" "}
+            {item.reviewsCount || 0} reviews
           </div>
 
           <p
@@ -145,7 +225,7 @@ export default function ProductDetails() {
               fontSize: "26px",
               fontWeight: "700",
               color: "#172033",
-              margin: "12px 0 20px"
+              margin: "12px 0 20px",
             }}
           >
             ₹{item.price?.toFixed(2)}
@@ -156,48 +236,68 @@ export default function ProductDetails() {
               color: "#50545b",
               lineHeight: "1.6",
               marginBottom: "28px",
-              fontSize: "14px"
+              fontSize: "14px",
             }}
           >
             {item.description}
           </p>
 
-          {/* Quantity Controls and Add to Cart */}
-          <div style={{ display: "flex", alignItems: "center", gap: "16px", flexWrap: "wrap" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "16px",
+              flexWrap: "wrap",
+            }}
+          >
             <div
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 border: "1px solid #dcdad3",
                 borderRadius: "20px",
-                overflow: "hidden"
+                overflow: "hidden",
               }}
             >
               <button
                 type="button"
-                onClick={() => setQuantity((prev) => Math.max(1, prev - 1))}
+                onClick={() =>
+                  setQuantity((prev) =>
+                    Math.max(1, prev - 1)
+                  )
+                }
                 style={{
                   padding: "8px 14px",
                   background: "transparent",
                   border: "none",
                   cursor: "pointer",
-                  fontSize: "16px"
+                  fontSize: "16px",
                 }}
               >
                 -
               </button>
-              <span style={{ padding: "0 10px", fontWeight: "600", fontSize: "14px" }}>
+
+              <span
+                style={{
+                  padding: "0 10px",
+                  fontWeight: "600",
+                  fontSize: "14px",
+                }}
+              >
                 {quantity}
               </span>
+
               <button
                 type="button"
-                onClick={() => setQuantity((prev) => prev + 1)}
+                onClick={() =>
+                  setQuantity((prev) => prev + 1)
+                }
                 style={{
                   padding: "8px 14px",
                   background: "transparent",
                   border: "none",
                   cursor: "pointer",
-                  fontSize: "16px"
+                  fontSize: "16px",
                 }}
               >
                 +
@@ -218,10 +318,16 @@ export default function ProductDetails() {
                 cursor: "pointer",
                 fontWeight: "600",
                 fontSize: "14px",
-                transition: "0.2s"
+                transition: "0.2s",
               }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "#d1a936")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "#172033")}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.background =
+                  "#d1a936")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.background =
+                  "#172033")
+              }
             >
               Add to Cart
             </button>
