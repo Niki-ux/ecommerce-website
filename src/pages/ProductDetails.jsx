@@ -1,11 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
-import { products } from "../data/products";
 
 export default function ProductDetails() {
   const { id } = useParams();
   const [quantity, setQuantity] = useState(1);
-  const item = products.find((p) => p.id === Number(id));
+  
+  // --- NEW API STATE ---
+  const [item, setItem] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // --- NEW FETCH LOGIC ---
+  useEffect(() => {
+    const fetchProduct = async () => {
+      try {
+        const response = await fetch(`/api/products/${id}`);
+        if (!response.ok) throw new Error('Product not found');
+        
+        const data = await response.json();
+        setItem(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProduct();
+  }, [id]);
+
+  if (loading) {
+    return <div style={{ textAlign: "center", padding: "80px 20px" }}><h2>Loading Details...</h2></div>;
+  }
+
+  if (error) {
+    return <div style={{ textAlign: "center", padding: "80px 20px" }}><h2>Error: {error}</h2></div>;
+  }
 
   if (!item) {
     return (
@@ -18,14 +48,17 @@ export default function ProductDetails() {
     );
   }
 
+  // --- CART LOGIC (Left for Annu to connect to backend) ---
   const handleAddToCart = () => {
     const existingCart = JSON.parse(localStorage.getItem("cart")) || [];
-    const existingIndex = existingCart.findIndex((cartItem) => cartItem.id === item.id);
+    // Added fallback for MongoDB _id
+    const itemId = item._id || item.id;
+    const existingIndex = existingCart.findIndex((cartItem) => (cartItem._id || cartItem.id) === itemId);
 
     let updatedCart;
     if (existingIndex > -1) {
       updatedCart = existingCart.map((cartItem) =>
-        cartItem.id === item.id
+        (cartItem._id || cartItem.id) === itemId
           ? { ...cartItem, quantity: (cartItem.quantity || 1) + quantity }
           : cartItem
       );
@@ -104,7 +137,7 @@ export default function ProductDetails() {
           </h1>
 
           <div style={{ color: "#d6ad35", fontSize: "14px", marginBottom: "16px" }}>
-            {"★".repeat(Math.floor(item.rating))} ({item.rating} / 5.0) · {item.reviewsCount} reviews
+            {"★".repeat(Math.floor(item.rating || 0))} ({item.rating || 0} / 5.0) · {item.reviewsCount || 0} reviews
           </div>
 
           <p
@@ -115,7 +148,7 @@ export default function ProductDetails() {
               margin: "12px 0 20px"
             }}
           >
-            ₹{item.price.toFixed(2)}
+            ₹{item.price?.toFixed(2)}
           </p>
 
           <p

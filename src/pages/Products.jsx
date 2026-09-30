@@ -1,15 +1,39 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
-import { products } from "../data/products";
 import ProductCard from "../components/ProductCard";
 
 const categories = ["All", "Electronics", "Accessories", "Footwear", "Apparel"];
 
 const Products = () => {
+  // --- NEW API STATE ---
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // --- EXISTING UI STATE ---
   const [searchParams, setSearchParams] = useSearchParams();
   const search = searchParams.get("search") || "";
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [sortBy, setSortBy] = useState("default");
+
+  // --- NEW FETCH LOGIC ---
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await fetch('/api/products');
+        if (!response.ok) throw new Error('Failed to fetch products');
+        
+        const data = await response.json();
+        setProducts(data);
+        setLoading(false);
+      } catch (err) {
+        setError(err.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Filter products by search query and category
   const filteredProducts = useMemo(() => {
@@ -18,6 +42,7 @@ const Products = () => {
       const matchesSearch =
         !searchText ||
         item.title?.toLowerCase().includes(searchText) ||
+        item.name?.toLowerCase().includes(searchText) || 
         item.category?.toLowerCase().includes(searchText) ||
         item.description?.toLowerCase().includes(searchText);
 
@@ -26,7 +51,7 @@ const Products = () => {
 
       return matchesSearch && matchesCategory;
     });
-  }, [search, selectedCategory]);
+  }, [products, search, selectedCategory]);
 
   // Sort filtered list
   const sortedProducts = useMemo(() => {
@@ -38,7 +63,7 @@ const Products = () => {
       return list.sort((a, b) => b.price - a.price);
     }
     if (sortBy === "rating") {
-      return list.sort((a, b) => b.rating - a.rating);
+      return list.sort((a, b) => (b.rating || 0) - (a.rating || 0));
     }
     return list;
   }, [filteredProducts, sortBy]);
@@ -49,6 +74,10 @@ const Products = () => {
     searchParams.delete("search");
     setSearchParams(searchParams);
   };
+
+  // --- LOADING / ERROR STATES ---
+  if (loading) return <div className="products-page"><h2>Loading Products...</h2></div>;
+  if (error) return <div className="products-page"><h2>Error: {error}</h2></div>;
 
   return (
     <div className="products-page">
@@ -111,8 +140,9 @@ const Products = () => {
       {/* Products Grid */}
       {sortedProducts.length > 0 ? (
         <div className="products-grid">
+          {/* Comment moved outside the implicit return map function */}
           {sortedProducts.map((item) => (
-            <ProductCard key={item.id} product={item} />
+            <ProductCard key={item._id || item.id} product={item} />
           ))}
         </div>
       ) : (
