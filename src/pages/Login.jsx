@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
@@ -6,16 +6,19 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
 
-    setError("");
-    setLoading(true);
+    if (!email || !password) {
+      alert("Please enter your email and password.");
+      return;
+    }
 
     try {
+      setLoading(true);
+
       const response = await fetch(
         `${import.meta.env.VITE_API_URL}/api/auth/login`,
         {
@@ -33,64 +36,82 @@ function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+        alert(data.message || "Login failed.");
+        return;
       }
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
-
       window.dispatchEvent(new Event("authUpdated"));
 
+      alert("Login successful!");
+
       navigate("/");
-    } catch (err) {
-      setError(err.message || "Something went wrong");
+    } catch (error) {
+      alert("Unable to connect to the server.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="auth-page">
-      <div className="auth-card">
-        <h1>Welcome back</h1>
-        <p className="auth-subtitle">Login to your ZOVA account</p>
+    <main className="login-page">
+      <div className="login-container">
 
-        {error && <p className="auth-error">{error}</p>}
+        <div className="login-heading">
+          <p>WELCOME BACK</p>
 
-        <form onSubmit={handleSubmit}>
-          <div className="auth-field">
+          <h1>Login</h1>
+
+          <span>
+            Sign in to continue to ZOVA.
+          </span>
+        </div>
+
+        <form
+          className="login-form"
+          onSubmit={handleLogin}
+        >
+          <div className="form-group">
             <label>Email</label>
+
             <input
               type="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
             />
           </div>
 
-          <div className="auth-field">
+          <div className="form-group">
             <label>Password</label>
+
             <input
               type="password"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
             />
           </div>
 
-          <button type="submit" className="auth-button" disabled={loading}>
+          <button
+            type="submit"
+            className="login-button"
+            disabled={loading}
+          >
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <p className="auth-switch">
+        <p className="login-footer">
           Don't have an account?{" "}
-          <Link to="/signup">Create one</Link>
+          <Link to="/signup">
+            Sign up
+          </Link>
         </p>
+
       </div>
-    </div>
+    </main>
   );
 }
 
