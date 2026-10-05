@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Login() {
@@ -6,109 +6,91 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleLogin = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!email || !password) {
-      alert("Please enter your email and password.");
-      return;
-    }
+    setError("");
+    setLoading(true);
 
     try {
-      setLoading(true);
-
-      const response = await fetch("http://localhost:5000/api/auth/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Login failed.");
-        return;
+        throw new Error(data.message || "Login failed");
       }
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+
       window.dispatchEvent(new Event("authUpdated"));
 
-      alert("Login successful!");
-
       navigate("/");
-    } catch (error) {
-      alert("Unable to connect to the server.");
+    } catch (err) {
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="login-page">
-      <div className="login-container">
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>Welcome back</h1>
+        <p className="auth-subtitle">Login to your ZOVA account</p>
 
-        <div className="login-heading">
-          <p>WELCOME BACK</p>
+        {error && <p className="auth-error">{error}</p>}
 
-          <h1>Login</h1>
-
-          <span>
-            Sign in to continue to ZOVA.
-          </span>
-        </div>
-
-        <form
-          className="login-form"
-          onSubmit={handleLogin}
-        >
-          <div className="form-group">
+        <form onSubmit={handleSubmit}>
+          <div className="auth-field">
             <label>Email</label>
-
             <input
               type="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
-          <div className="form-group">
+          <div className="auth-field">
             <label>Password</label>
-
             <input
               type="password"
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <button
-            type="submit"
-            className="login-button"
-            disabled={loading}
-          >
+          <button type="submit" className="auth-button" disabled={loading}>
             {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 
-        <p className="login-footer">
+        <p className="auth-switch">
           Don't have an account?{" "}
-          <Link to="/signup">
-            Sign up
-          </Link>
+          <Link to="/signup">Create one</Link>
         </p>
-
       </div>
-    </main>
+    </div>
   );
 }
 

@@ -25,7 +25,7 @@ const Products = () => {
     const fetchProducts = async () => {
       try {
         const response = await fetch(
-          "http://localhost:5000/api/products"
+          `${import.meta.env.VITE_API_URL}/api/products`
         );
 
         if (!response.ok) {

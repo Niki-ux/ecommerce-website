@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 function Signup() {
@@ -7,121 +7,103 @@ function Signup() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSignup = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!name || !email || !password) {
-      alert("Please fill all fields.");
-      return;
-    }
+    setError("");
+    setLoading(true);
 
     try {
-      setLoading(true);
-
-      const response = await fetch("http://localhost:5000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name,
+            email,
+            password,
+          }),
+        }
+      );
 
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Registration failed.");
-        return;
+        throw new Error(data.message || "Registration failed");
       }
 
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+
       window.dispatchEvent(new Event("authUpdated"));
 
-      alert("Account created successfully!");
-
       navigate("/");
-    } catch (error) {
-      alert("Unable to connect to the server.");
+    } catch (err) {
+      setError(err.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <main className="login-page">
-      <div className="login-container">
+    <div className="auth-page">
+      <div className="auth-card">
+        <h1>Create account</h1>
+        <p className="auth-subtitle">Join ZOVA today</p>
 
-        <div className="login-heading">
-          <p>WELCOME TO ZOVA</p>
+        {error && <p className="auth-error">{error}</p>}
 
-          <h1>Sign Up</h1>
-
-          <span>
-            Create your account to get started.
-          </span>
-        </div>
-
-        <form
-          className="login-form"
-          onSubmit={handleSignup}
-        >
-          <div className="form-group">
+        <form onSubmit={handleSubmit}>
+          <div className="auth-field">
             <label>Name</label>
-
             <input
               type="text"
               placeholder="Enter your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
 
-          <div className="form-group">
+          <div className="auth-field">
             <label>Email</label>
-
             <input
               type="email"
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
-          <div className="form-group">
+          <div className="auth-field">
             <label>Password</label>
-
             <input
               type="password"
               placeholder="Create a password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
 
-          <button
-            type="submit"
-            className="login-button"
-            disabled={loading}
-          >
-            {loading ? "Creating Account..." : "Sign Up"}
+          <button type="submit" className="auth-button" disabled={loading}>
+            {loading ? "Creating account..." : "Create Account"}
           </button>
         </form>
 
-        <p className="login-footer">
+        <p className="auth-switch">
           Already have an account?{" "}
-          <Link to="/login">
-            Login
-          </Link>
+          <Link to="/login">Login</Link>
         </p>
-
       </div>
-    </main>
+    </div>
   );
 }
 

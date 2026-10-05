@@ -16,7 +16,7 @@ export default function ProductDetails() {
 
       try {
         const response = await fetch(
-          `http://localhost:5000/api/products/${id}`
+          `${import.meta.env.VITE_API_URL}/api/products/${id}`
         );
 
         if (!response.ok) {
