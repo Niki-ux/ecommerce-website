@@ -1,5 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
+import {
+  FiSearch,
+  FiHeart,
+  FiShoppingBag,
+  FiUser,
+  FiChevronDown,
+  FiMenu,
+  FiX,
+} from "react-icons/fi";
+
 import logo from "../assets/zova-logo.svg";
 
 function Navbar() {
@@ -67,6 +77,7 @@ function Navbar() {
     window.addEventListener("storage", checkWishlist);
     window.addEventListener("wishlistUpdated", checkWishlist);
     window.addEventListener("authUpdated", checkLogin);
+
     document.addEventListener("mousedown", handleClickOutside);
 
     return () => {
@@ -76,6 +87,7 @@ function Navbar() {
         checkWishlist
       );
       window.removeEventListener("authUpdated", checkLogin);
+
       document.removeEventListener(
         "mousedown",
         handleClickOutside
@@ -125,74 +137,111 @@ function Navbar() {
 
   return (
     <nav className="navbar">
+
       <div className="nav-container">
 
         {/* Logo */}
+
         <Link
           to="/"
           className="logo"
           onClick={closeMenu}
         >
-          <img src={logo} alt="ZOVA" />
+          <img
+            src={logo}
+            alt="ZOVA"
+          />
         </Link>
 
-        {/* Desktop Navigation */}
+
+        {/* Main Navigation */}
+
         <div className="nav-links">
-          <NavLink to="/" end>
+
+          <NavLink
+            to="/"
+            end
+          >
             Home
           </NavLink>
 
-          <NavLink to="/products">
+          <NavLink
+            to="/products"
+          >
             Products
           </NavLink>
+
         </div>
 
+
         {/* Search */}
+
         <div className="search-box">
-          <span>⌕</span>
+
+          <FiSearch className="search-icon" />
 
           <input
             type="text"
             value={search}
             onChange={handleSearch}
-            placeholder="Search products..."
+            placeholder="Search products"
           />
+
         </div>
 
-        {/* Wishlist */}
-        <Link
-          to="/wishlist"
-          className="nav-icon-link wishlist-link"
-        >
-          <span
-            className={`nav-icon wishlist-nav-icon ${
-              hasWishlist ? "wishlist-active" : ""
-            }`}
-          >
-            {hasWishlist ? "♥" : "♡"}
-          </span>
 
-          <span>Wishlist</span>
-        </Link>
+        {/* Wishlist */}
+
+        <NavLink
+          to="/wishlist"
+          className={({ isActive }) =>
+            `nav-text-link ${
+              isActive ? "active" : ""
+            }`
+          }
+        >
+          <FiHeart
+            className="nav-icon"
+            fill={
+              hasWishlist
+                ? "currentColor"
+                : "none"
+            }
+          />
+
+          <span>
+            Wishlist
+          </span>
+        </NavLink>
+
 
         {/* Cart */}
-        <Link
-          to="/cart"
-          className="nav-icon-link cart-link"
-        >
-          <span className="nav-icon">
-            🛒
-          </span>
 
-          <span>Cart</span>
-        </Link>
+        <NavLink
+          to="/cart"
+          className={({ isActive }) =>
+            `nav-text-link ${
+              isActive ? "active" : ""
+            }`
+          }
+        >
+          <FiShoppingBag className="nav-icon" />
+
+          <span>
+            Cart
+          </span>
+        </NavLink>
+
 
         {/* Profile / Login */}
+
         {isLoggedIn ? (
+
           <div
             className="nav-profile"
             ref={profileRef}
           >
+
             <button
               type="button"
               className="profile-button"
@@ -201,27 +250,36 @@ function Navbar() {
               }
               aria-expanded={profileOpen}
             >
-              <span className="profile-icon">
-                👤
+
+              <span className="profile-avatar-small">
+                {getFirstName()
+                  .charAt(0)
+                  .toUpperCase()}
               </span>
 
               <span className="profile-name">
                 {getFirstName()}
               </span>
 
-              <span
+              <FiChevronDown
                 className={`profile-arrow ${
-                  profileOpen ? "profile-arrow-open" : ""
+                  profileOpen
+                    ? "profile-arrow-open"
+                    : ""
                 }`}
-              >
-                ▾
-              </span>
+              />
+
             </button>
 
+
+            {/* Profile Dropdown */}
+
             {profileOpen && (
+
               <div className="profile-dropdown">
 
                 <div className="profile-header">
+
                   <div className="profile-avatar">
                     {getFirstName()
                       .charAt(0)
@@ -229,12 +287,22 @@ function Navbar() {
                   </div>
 
                   <div className="profile-info">
-                    <strong>{user?.name}</strong>
-                    <span>{user?.email}</span>
+
+                    <strong>
+                      {user?.name}
+                    </strong>
+
+                    <span>
+                      {user?.email}
+                    </span>
+
                   </div>
+
                 </div>
 
+
                 <div className="profile-divider" />
+
 
                 <Link
                   to="/profile"
@@ -243,9 +311,13 @@ function Navbar() {
                     setProfileOpen(false)
                   }
                 >
-                  <span>👤</span>
-                  <span>My Profile</span>
+                  <FiUser />
+
+                  <span>
+                    My Profile
+                  </span>
                 </Link>
+
 
                 <Link
                   to="/orders"
@@ -254,55 +326,81 @@ function Navbar() {
                     setProfileOpen(false)
                   }
                 >
-                  <span>📦</span>
-                  <span>My Orders</span>
+                  <FiShoppingBag />
+
+                  <span>
+                    My Orders
+                  </span>
                 </Link>
 
+
                 <div className="profile-divider" />
+
 
                 <button
                   type="button"
                   className="profile-logout"
                   onClick={handleLogout}
                 >
-                  <span>↪</span>
-                  <span>Logout</span>
+                  Logout
                 </button>
 
               </div>
+
             )}
+
           </div>
+
         ) : (
-          <Link
+
+          <NavLink
             to="/login"
-            className="nav-login"
+            className={({ isActive }) =>
+              `nav-login ${
+                isActive ? "active" : ""
+              }`
+            }
           >
-            Login
-          </Link>
+            <FiUser className="nav-icon" />
+
+            <span>
+              Login
+            </span>
+          </NavLink>
+
         )}
 
-        {/* Mobile Icons */}
+        {/* Mobile Actions */}
+
         <div className="mobile-nav-actions">
 
           <Link to="/wishlist">
-            <span
+
+            <FiHeart
               className={
                 hasWishlist
                   ? "mobile-heart active"
                   : "mobile-heart"
               }
-            >
-              {hasWishlist ? "♥" : "♡"}
-            </span>
+              fill={
+                hasWishlist
+                  ? "currentColor"
+                  : "none"
+              }
+            />
+
           </Link>
+
 
           <Link to="/cart">
-            <span className="mobile-cart">
-              🛒
-            </span>
+
+            <FiShoppingBag className="mobile-cart" />
+
           </Link>
 
+
           {isLoggedIn && (
+
             <button
               type="button"
               className="mobile-profile-icon"
@@ -311,9 +409,13 @@ function Navbar() {
               }
               aria-label="Open profile"
             >
-              👤
+              {getFirstName()
+                .charAt(0)
+                .toUpperCase()}
             </button>
+
           )}
+
 
           <button
             type="button"
@@ -323,14 +425,22 @@ function Navbar() {
             }
             aria-label="Open menu"
           >
-            ☰
+            {menuOpen ? (
+              <FiX />
+            ) : (
+              <FiMenu />
+            )}
           </button>
 
         </div>
+
       </div>
 
+
       {/* Mobile Menu */}
+
       {menuOpen && (
+
         <div className="mobile-menu">
 
           <NavLink
@@ -362,8 +472,11 @@ function Navbar() {
             Cart
           </NavLink>
 
+
           {isLoggedIn ? (
+
             <>
+
               <NavLink
                 to="/profile"
                 onClick={closeMenu}
@@ -384,32 +497,44 @@ function Navbar() {
               >
                 Logout
               </button>
+
             </>
+
           ) : (
+
             <NavLink
               to="/login"
               onClick={closeMenu}
             >
               Login
             </NavLink>
+
           )}
 
         </div>
+
       )}
 
+
       {/* Mobile Search */}
+
       <div className="mobile-search">
+
         <div className="search-box">
-          <span>⌕</span>
+
+          <FiSearch className="search-icon" />
 
           <input
             type="text"
             value={search}
             onChange={handleSearch}
-            placeholder="Search products..."
+            placeholder="Search products"
           />
+
         </div>
+
       </div>
+
     </nav>
   );
 }

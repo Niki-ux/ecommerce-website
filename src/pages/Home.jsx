@@ -5,29 +5,19 @@ function Home() {
     <main className="home-page">
       <section className="simple-hero">
 
-        <div className="arrival-content">
-
-          <p className="arrival-label">
-            NEW ARRIVALS
-          </p>
+        <div className="hero-content">
+          <p className="hero-logo">ZOVA</p>
 
           <h1>
-            JUST <span>FOR</span>{" "}
-            <em>you</em>
+            Everything you want.
+            <br />
+            <span>All in one place.</span>
           </h1>
 
-          <div className="discount-sticker">
-            <strong>30% OFF</strong>
-            <small>ONLINE ORDER</small>
-          </div>
-
-          <Link
-            to="/products"
-            className="arrival-button"
-          >
-            SHOP NOW →
+          <Link to="/products" className="hero-button">
+            SHOP NOW
+            <span>→</span>
           </Link>
-
         </div>
 
       </section>
