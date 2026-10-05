@@ -197,7 +197,7 @@ function Orders() {
                     </span>
 
                     <strong>
-                      ₹{order.total.toLocaleString("en-IN")}
+                      ₹{order.totalAmount.toLocaleString("en-IN")}
                     </strong>
                   </div>
 

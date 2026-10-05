@@ -11,6 +11,9 @@ export default function ProductDetails() {
 
   useEffect(() => {
     const fetchProduct = async () => {
+
+      console.log("ADD TO sCART BUTTON CLICKED");
+
       try {
         const response = await fetch(
           `http://localhost:5000/api/products/${id}`
@@ -82,49 +85,39 @@ export default function ProductDetails() {
     );
   }
 
-  // Cart integration will be connected to the backend separately.
-  const handleAddToCart = () => {
-    const existingCart =
-      JSON.parse(localStorage.getItem("cart")) || [];
+ const handleAddToCart = async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-    const itemId = item._id || item.id;
-
-    const existingIndex = existingCart.findIndex(
-      (cartItem) =>
-        (cartItem._id || cartItem.id) === itemId
-    );
-
-    let updatedCart;
-
-    if (existingIndex > -1) {
-      updatedCart = existingCart.map((cartItem) =>
-        (cartItem._id || cartItem.id) === itemId
-          ? {
-              ...cartItem,
-              quantity:
-                (cartItem.quantity || 1) + quantity,
-            }
-          : cartItem
-      );
-    } else {
-      updatedCart = [
-        ...existingCart,
-        {
-          ...item,
-          quantity,
-        },
-      ];
+    if (!token) {
+      alert("Please login first.");
+      return;
     }
 
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(updatedCart)
-    );
+    const response = await fetch("http://localhost:5000/api/cart", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({
+        productId: item._id || item.id,
+        quantity: quantity,
+      }),
+    });
 
-    alert(
-      `Added ${quantity} × ${item.title} to your cart!`
-    );
-  };
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Failed to add product to cart");
+    }
+
+    alert(`Added ${quantity} × ${item.title} to your cart!`);
+  } catch (error) {
+    console.error("Add to cart error:", error);
+    alert(error.message);
+  }
+};
 
   return (
     <div

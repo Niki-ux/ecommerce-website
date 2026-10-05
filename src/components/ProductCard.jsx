@@ -51,40 +51,69 @@ export default function ProductCard({ product }) {
     alert(`${product.title} added to cart!`);
   };
 
-  const toggleWishlist = () => {
-    const wishlist =
-      JSON.parse(localStorage.getItem("wishlist")) || [];
+const toggleWishlist = async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-    const alreadyExists = wishlist.some(
-      (item) => (item._id || item.id) === productId
-    );
-
-    let updatedWishlist;
-
-    if (alreadyExists) {
-      updatedWishlist = wishlist.filter(
-        (item) => (item._id || item.id) !== productId
-      );
-
-      setIsWishlisted(false);
-    } else {
-      updatedWishlist = [
-        ...wishlist,
-        product,
-      ];
-
-      setIsWishlisted(true);
+    if (!token) {
+      alert("Please login first.");
+      return;
     }
 
-    localStorage.setItem(
-      "wishlist",
-      JSON.stringify(updatedWishlist)
+    // REMOVE FROM WISHLIST
+    if (isWishlisted) {
+      const response = await fetch(
+        `http://localhost:5000/api/wishlist/${productId}`,
+        {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to remove from wishlist"
+        );
+      }
+
+      setIsWishlisted(false);
+      return;
+    }
+
+    // ADD TO WISHLIST
+    const response = await fetch(
+      "http://localhost:5000/api/wishlist",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          productId: productId,
+        }),
+      }
     );
 
-    window.dispatchEvent(
-      new Event("wishlistUpdated")
-    );
-  };
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to add to wishlist"
+      );
+    }
+
+    setIsWishlisted(true);
+  } catch (error) {
+    console.error("Wishlist error:", error);
+    alert(error.message);
+  }
+};
 
   return (
     <div className="product-card">

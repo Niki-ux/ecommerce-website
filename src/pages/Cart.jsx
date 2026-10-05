@@ -1,61 +1,229 @@
 import React, { useEffect, useState } from "react";
 
+const API_URL = "http://localhost:5000/api/cart";
+
 function Cart() {
-  const [cart, setCart] = useState([]);
 
-  // Get cart from localStorage
-  useEffect(() => {
-    const savedCart = JSON.parse(localStorage.getItem("cart")) || [];
-    setCart(savedCart);
-  }, []);
+  const handleCheckout = async () => {
+  try {
+    const token = localStorage.getItem("token");
 
-  // Increase quantity
-  const increaseQuantity = (id) => {
-    const updatedCart = cart.map((item) =>
-      item.id === id
-        ? { ...item, quantity: (item.quantity || 1) + 1 }
-        : item
+    if (!token) {
+      alert("Please login first.");
+      return;
+    }
+
+    const response = await fetch(
+      "http://localhost:5000/api/orders",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          shippingAddress: "IIT Jodhpur, Rajasthan",
+        }),
+      }
     );
 
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.message || "Failed to create order"
+      );
+    }
+
+    alert("Order placed successfully!");
+
+  } catch (error) {
+    console.error("Checkout error:", error);
+    alert(error.message);
+  }
+};
+  const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Get JWT token
+  const getToken = () => {
+    return localStorage.getItem("token");
   };
 
-  // Decrease quantity
-  const decreaseQuantity = (id) => {
-    const updatedCart = cart
-      .map((item) =>
-        item.id === id
-          ? { ...item, quantity: (item.quantity || 1) - 1 }
-          : item
-      )
-      .filter((item) => item.quantity > 0);
+  // Headers for authenticated API requests
+  const getHeaders = () => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${getToken()}`,
+  });
 
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  // =========================
+  // GET CART FROM BACKEND
+  // =========================
+  const fetchCart = async () => {
+    try {
+      const token = getToken();
+
+      if (!token) {
+        console.log("User is not logged in");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to fetch cart");
+      }
+
+      setCart(data.items || []);
+    } catch (error) {
+      console.error("Fetch cart error:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  // Remove product
-  const removeFromCart = (id) => {
-    const updatedCart = cart.filter((item) => item.id !== id);
+  // Fetch cart when page loads
+  useEffect(() => {
+    fetchCart();
+  }, []);
 
-    setCart(updatedCart);
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
+  // =========================
+  // INCREASE QUANTITY
+  // =========================
+  const increaseQuantity = async (productId, currentQuantity) => {
+    try {
+      const response = await fetch(`${API_URL}/${productId}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          quantity: currentQuantity + 1,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update quantity");
+      }
+
+      setCart(data.items || []);
+    } catch (error) {
+      console.error("Increase quantity error:", error);
+    }
   };
 
-  // Clear entire cart
-  const clearCart = () => {
-    setCart([]);
-    localStorage.removeItem("cart");
+  // =========================
+  // DECREASE QUANTITY
+  // =========================
+  const decreaseQuantity = async (productId, currentQuantity) => {
+    if (currentQuantity <= 1) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_URL}/${productId}`, {
+        method: "PUT",
+        headers: getHeaders(),
+        body: JSON.stringify({
+          quantity: currentQuantity - 1,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to update quantity");
+      }
+
+      setCart(data.items || []);
+    } catch (error) {
+      console.error("Decrease quantity error:", error);
+    }
   };
 
-  // Calculate total
-  const total = cart.reduce(
-    (sum, item) => sum + Number(item.price) * (item.quantity || 1),
-    0
-  );
+  // =========================
+  // REMOVE PRODUCT
+  // =========================
+  const removeFromCart = async (productId) => {
+    try {
+      const response = await fetch(`${API_URL}/${productId}`, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
 
-  // Empty cart
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to remove product");
+      }
+
+      setCart(data.items || []);
+    } catch (error) {
+      console.error("Remove product error:", error);
+    }
+  };
+
+  // =========================
+  // CLEAR CART
+  // =========================
+  const clearCart = async () => {
+    try {
+      const response = await fetch(API_URL, {
+        method: "DELETE",
+        headers: getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to clear cart");
+      }
+
+      setCart([]);
+    } catch (error) {
+      console.error("Clear cart error:", error);
+    }
+  };
+
+  // =========================
+  // CALCULATE TOTAL
+  // =========================
+  const total = cart.reduce((sum, item) => {
+    const product = item.product;
+
+    return (
+      sum +
+      Number(product?.price || 0) * Number(item.quantity || 1)
+    );
+  }, 0);
+
+  // =========================
+  // LOADING
+  // =========================
+  if (loading) {
+    return (
+      <div
+        style={{
+          maxWidth: "1100px",
+          margin: "40px auto",
+          padding: "24px",
+          textAlign: "center",
+        }}
+      >
+        <h2>Loading cart...</h2>
+      </div>
+    );
+  }
+
+  // =========================
+  // EMPTY CART
+  // =========================
   if (cart.length === 0) {
     return (
       <div
@@ -72,6 +240,9 @@ function Cart() {
     );
   }
 
+  // =========================
+  // CART UI
+  // =========================
   return (
     <div
       style={{
@@ -82,75 +253,90 @@ function Cart() {
     >
       <h1 style={{ marginBottom: "30px" }}>Your Cart</h1>
 
-      {cart.map((item) => (
-        <div
-          key={item.id}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: "20px",
-            padding: "20px",
-            marginBottom: "15px",
-            border: "1px solid #ddd",
-            borderRadius: "8px",
-          }}
-        >
-          {/* Product Image */}
-          <img
-            src={item.image}
-            alt={item.title}
+      {cart.map((item) => {
+        const product = item.product;
+        const productId = product?._id;
+        const quantity = item.quantity || 1;
+
+        return (
+          <div
+            key={productId}
             style={{
-              width: "100px",
-              height: "100px",
-              objectFit: "cover",
-              borderRadius: "6px",
-            }}
-          />
-
-          {/* Product Information */}
-          <div style={{ flex: 1 }}>
-            <h3>{item.title}</h3>
-
-            <p>
-              Price: <strong>₹{item.price}</strong>
-            </p>
-
-            {/* Quantity */}
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "10px",
-              }}
-            >
-              <button onClick={() => decreaseQuantity(item.id)}>
-                −
-              </button>
-
-              <span>{item.quantity || 1}</span>
-
-              <button onClick={() => increaseQuantity(item.id)}>
-                +
-              </button>
-            </div>
-          </div>
-
-          {/* Remove */}
-          <button
-            onClick={() => removeFromCart(item.id)}
-            style={{
-              padding: "8px 12px",
-              backgroundColor: "#dc2626",
-              color: "white",
-              border: "none",
-              borderRadius: "5px",
-              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              gap: "20px",
+              padding: "20px",
+              marginBottom: "15px",
+              border: "1px solid #ddd",
+              borderRadius: "8px",
             }}
           >
-            Remove
-          </button>
-        </div>
-      ))}
+            {/* Product Image */}
+            <img
+              src={product?.image}
+              alt={product?.title}
+              style={{
+                width: "100px",
+                height: "100px",
+                objectFit: "cover",
+                borderRadius: "6px",
+              }}
+            />
+
+            {/* Product Information */}
+            <div style={{ flex: 1 }}>
+              <h3>{product?.title}</h3>
+
+              <p>
+                Price: <strong>₹{product?.price}</strong>
+              </p>
+
+              {/* Quantity */}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <button
+                  onClick={() =>
+                    decreaseQuantity(productId, quantity)
+                  }
+                  disabled={quantity <= 1}
+                >
+                  −
+                </button>
+
+                <span>{quantity}</span>
+
+                <button
+                  onClick={() =>
+                    increaseQuantity(productId, quantity)
+                  }
+                >
+                  +
+                </button>
+              </div>
+            </div>
+
+            {/* Remove */}
+            <button
+              onClick={() => removeFromCart(productId)}
+              style={{
+                padding: "8px 12px",
+                backgroundColor: "#dc2626",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Remove
+            </button>
+          </div>
+        );
+      })}
 
       {/* Cart Summary */}
       <div
@@ -162,7 +348,12 @@ function Cart() {
         }}
       >
         <h2>Total: ₹{total.toFixed(2)}</h2>
-
+        <button
+  className="checkout-button"
+  onClick={handleCheckout}
+>
+  Checkout
+</button>
         <button
           onClick={clearCart}
           style={{

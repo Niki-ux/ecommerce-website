@@ -1,52 +1,110 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
+const API_URL = "http://localhost:5000/api/wishlist";
+
 function Wishlist() {
   const [wishlist, setWishlist] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const loadWishlist = () => {
+  // Get JWT token
+  const getToken = () => {
+    return localStorage.getItem("token");
+  };
+
+  // Headers for authenticated API requests
+  const getHeaders = () => ({
+    "Content-Type": "application/json",
+    Authorization: `Bearer ${getToken()}`,
+  });
+
+  // =========================
+  // GET WISHLIST FROM BACKEND
+  // =========================
+  const loadWishlist = async () => {
     try {
-      const savedWishlist =
-        JSON.parse(localStorage.getItem("wishlist")) || [];
+      const token = getToken();
 
-      setWishlist(savedWishlist);
-    } catch {
-      setWishlist([]);
+      if (!token) {
+        console.log("User is not logged in");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch(API_URL, {
+        method: "GET",
+        headers: getHeaders(),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to fetch wishlist"
+        );
+      }
+
+      setWishlist(data.products || []);
+    } catch (error) {
+      console.error("Fetch wishlist error:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
+  // Load wishlist when page opens
   useEffect(() => {
     loadWishlist();
-
-    window.addEventListener(
-      "wishlistUpdated",
-      loadWishlist
-    );
-
-    return () => {
-      window.removeEventListener(
-        "wishlistUpdated",
-        loadWishlist
-      );
-    };
   }, []);
 
-  const removeFromWishlist = (id) => {
-    const updatedWishlist = wishlist.filter(
-      (item) => item.id !== id
-    );
+  // =========================
+  // REMOVE FROM WISHLIST
+  // =========================
+  const removeFromWishlist = async (productId) => {
+    try {
+      const response = await fetch(
+        `${API_URL}/${productId}`,
+        {
+          method: "DELETE",
+          headers: getHeaders(),
+        }
+      );
 
-    setWishlist(updatedWishlist);
+      const data = await response.json();
 
-    localStorage.setItem(
-      "wishlist",
-      JSON.stringify(updatedWishlist)
-    );
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to remove from wishlist"
+        );
+      }
 
-    window.dispatchEvent(
-      new Event("wishlistUpdated")
-    );
+      setWishlist(data.products || []);
+    } catch (error) {
+      console.error(
+        "Remove wishlist error:",
+        error
+      );
+    }
   };
+
+  // =========================
+  // LOADING
+  // =========================
+  if (loading) {
+    return (
+      <main className="wishlist-page">
+        <div className="wishlist-header">
+          <p className="wishlist-label">
+            YOUR COLLECTION
+          </p>
+
+          <h1>Wishlist</h1>
+
+          <span>Loading...</span>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="wishlist-page">
@@ -102,58 +160,61 @@ function Wishlist() {
         /* Wishlist Products */
         <div className="wishlist-grid">
 
-          {wishlist.map((product) => (
+          {wishlist.map((item) => {
 
-            <div
-              className="wishlist-card"
-              key={product.id}
-            >
+            const product = item;
+            const productId = product?._id;
 
-              <div className="wishlist-image-wrapper">
+            return (
+              <div
+                className="wishlist-card"
+                key={productId}
+              >
 
-                <Link
-                  to={`/product/${product.id}`}
-                >
-                  <img
-                    src={product.image}
-                    alt={product.title}
-                  />
-                </Link>
+                <div className="wishlist-image-wrapper">
 
-                <button
-                  className="wishlist-remove"
-                  onClick={() =>
-                    removeFromWishlist(product.id)
-                  }
-                  aria-label="Remove from wishlist"
-                >
-                  ♥
-                </button>
+                  <Link
+                    to={`/product/${productId}`}
+                  >
+                    <img
+                      src={product?.image}
+                      alt={product?.title}
+                    />
+                  </Link>
+
+                  <button
+                    className="wishlist-remove"
+                    onClick={() =>
+                      removeFromWishlist(productId)
+                    }
+                    aria-label="Remove from wishlist"
+                  >
+                    ♥
+                  </button>
+
+                </div>
+
+                <div className="wishlist-info">
+
+                  <p className="wishlist-category">
+                    {product?.category}
+                  </p>
+
+                  <h3>
+                    {product?.title}
+                  </h3>
+
+                  <p className="wishlist-price">
+                    ₹{product?.price}
+                  </p>
+
+                </div>
 
               </div>
-
-              <div className="wishlist-info">
-
-                <p className="wishlist-category">
-                  {product.category}
-                </p>
-
-                <h3>
-                  {product.title}
-                </h3>
-
-                <p className="wishlist-price">
-                  ₹{product.price}
-                </p>
-
-              </div>
-
-            </div>
-
-          ))}
+            );
+          })}
 
         </div>
-
       )}
 
     </main>
