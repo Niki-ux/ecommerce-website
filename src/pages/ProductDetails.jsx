@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import toast from "react-hot-toast";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -90,7 +91,7 @@ export default function ProductDetails() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("Please login first.");
+      toast.error("Please login first.");
       return;
     }
 
@@ -112,10 +113,10 @@ export default function ProductDetails() {
       throw new Error(data.message || "Failed to add product to cart");
     }
 
-    alert(`Added ${quantity} × ${item.title} to your cart!`);
+    toast.success(`Added ${quantity} × ${item.title} to your cart!`);
   } catch (error) {
     console.error("Add to cart error:", error);
-    alert(error.message);
+    toast.error(error.message);
   }
 };
 
