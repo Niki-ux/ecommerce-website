@@ -1,22 +1,21 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
-const API_URL = "http://localhost:5000/api/cart";
-
 function Cart() {
+  // FIXED: Use environment variable instead of hardcoded localhost
+  const API_URL = `${import.meta.env.VITE_API_URL}/api/cart`;
 
   const handleCheckout = async () => {
-  try {
-    const token = localStorage.getItem("token");
+    try {
+      const token = localStorage.getItem("token");
 
-    if (!token) {
-      toast.error("Please login first.");
-      return;
-    }
+      if (!token) {
+        toast.error("Please login first.");
+        return;
+      }
 
-    const response = await fetch(
-      "http://localhost:5000/api/orders",
-      {
+      // FIXED: Use environment variable instead of hardcoded localhost
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -25,24 +24,25 @@ function Cart() {
         body: JSON.stringify({
           shippingAddress: "IIT Jodhpur, Rajasthan",
         }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to create order");
       }
-    );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to create order"
-      );
+      toast.success("Order placed successfully!");
+      
+      // Auto-refresh the cart to show it is now empty after checkout
+      fetchCart();
+      
+    } catch (error) {
+      console.error("Checkout error:", error);
+      toast.error(error.message);
     }
+  };
 
-    toast.success("Order placed successfully!");
-
-  } catch (error) {
-    console.error("Checkout error:", error);
-    toast.error(error.message);
-  }
-};
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -199,8 +199,7 @@ function Cart() {
     const product = item.product;
 
     return (
-      sum +
-      Number(product?.price || 0) * Number(item.quantity || 1)
+      sum + Number(product?.price || 0) * Number(item.quantity || 1)
     );
   }, 0);
 
@@ -301,9 +300,7 @@ function Cart() {
                 }}
               >
                 <button
-                  onClick={() =>
-                    decreaseQuantity(productId, quantity)
-                  }
+                  onClick={() => decreaseQuantity(productId, quantity)}
                   disabled={quantity <= 1}
                 >
                   −
@@ -311,11 +308,7 @@ function Cart() {
 
                 <span>{quantity}</span>
 
-                <button
-                  onClick={() =>
-                    increaseQuantity(productId, quantity)
-                  }
-                >
+                <button onClick={() => increaseQuantity(productId, quantity)}>
                   +
                 </button>
               </div>
@@ -349,12 +342,9 @@ function Cart() {
         }}
       >
         <h2>Total: ₹{total.toFixed(2)}</h2>
-        <button
-  className="checkout-button"
-  onClick={handleCheckout}
->
-  Checkout
-</button>
+        <button className="checkout-button" onClick={handleCheckout}>
+          Checkout
+        </button>
         <button
           onClick={clearCart}
           style={{

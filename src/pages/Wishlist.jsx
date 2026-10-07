@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-
-const API_URL = "http://localhost:5000/api/wishlist";
+import toast from "react-hot-toast";
 
 function Wishlist() {
+  // FIXED: Use environment variable instead of hardcoded localhost
+  const API_URL = `${import.meta.env.VITE_API_URL}/api/wishlist`;
+
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -47,6 +49,7 @@ function Wishlist() {
       setWishlist(data.products || []);
     } catch (error) {
       console.error("Fetch wishlist error:", error);
+      toast.error("Failed to load wishlist.");
     } finally {
       setLoading(false);
     }
@@ -79,11 +82,10 @@ function Wishlist() {
       }
 
       setWishlist(data.products || []);
+      toast.success("Removed from wishlist");
     } catch (error) {
-      console.error(
-        "Remove wishlist error:",
-        error
-      );
+      console.error("Remove wishlist error:", error);
+      toast.error(error.message || "Could not remove item.");
     }
   };
 
