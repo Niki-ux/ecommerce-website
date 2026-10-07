@@ -1,94 +1,86 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 export default function ProductCard({ product }) {
   const productId = product._id || product.id;
 
   const [isWishlisted, setIsWishlisted] = useState(() => {
-    const wishlist =
-      JSON.parse(localStorage.getItem("wishlist")) || [];
-
-    return wishlist.some(
-      (item) => (item._id || item.id) === productId
-    );
+    const wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+    return wishlist.some((item) => (item._id || item.id) === productId);
   });
 
-  const addToCart = () => {
-    const existingCart =
-      JSON.parse(localStorage.getItem("cart")) || [];
+  // FIXED: Now properly connects to the backend Database instead of LocalStorage
+  const addToCart = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const existingProduct = existingCart.find(
-      (item) => (item._id || item.id) === productId
-    );
+      if (!token) {
+        toast.error("Please login first.");
+        return;
+      }
 
-    let updatedCart;
-
-    if (existingProduct) {
-      updatedCart = existingCart.map((item) =>
-        (item._id || item.id) === productId
-          ? {
-              ...item,
-              quantity: (item.quantity || 1) + 1,
-            }
-          : item
-      );
-    } else {
-      updatedCart = [
-        ...existingCart,
-        {
-          ...product,
-          quantity: 1,
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/cart`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
-      ];
-    }
-
-    localStorage.setItem(
-      "cart",
-      JSON.stringify(updatedCart)
-    );
-
-    alert(`${product.title} added to cart!`);
-  };
-
-const toggleWishlist = async () => {
-  try {
-    const token = localStorage.getItem("token");
-
-    if (!token) {
-      alert("Please login first.");
-      return;
-    }
-
-    // REMOVE FROM WISHLIST
-    if (isWishlisted) {
-      const response = await fetch(
-        `http://localhost:5000/api/wishlist/${productId}`,
-        {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+        body: JSON.stringify({
+          productId: productId,
+          quantity: 1, // Default quantity of 1 when adding from the product card
+        }),
+      });
 
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(
-          data.message || "Failed to remove from wishlist"
-        );
+        throw new Error(data.message || "Failed to add product to cart");
       }
 
-      setIsWishlisted(false);
-      return;
+      toast.success(`${product.title} added to cart!`);
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error(error.message);
     }
+  };
 
-    // ADD TO WISHLIST
-    const response = await fetch(
-      "http://localhost:5000/api/wishlist",
-      {
+  const toggleWishlist = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        toast.error("Please login first.");
+        return;
+      }
+
+      if (isWishlisted) {
+        // FIXED: Removed hardcoded localhost
+        const response = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/wishlist/${productId}`,
+          {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to remove from wishlist");
+        }
+
+        setIsWishlisted(false);
+        toast.success("Removed from wishlist");
+        return;
+      }
+
+      // FIXED: Removed hardcoded localhost
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/wishlist`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -97,23 +89,21 @@ const toggleWishlist = async () => {
         body: JSON.stringify({
           productId: productId,
         }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to add to wishlist");
       }
-    );
 
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to add to wishlist"
-      );
+      setIsWishlisted(true);
+      toast.success("Added to wishlist!");
+    } catch (error) {
+      console.error("Wishlist error:", error);
+      toast.error(error.message);
     }
-
-    setIsWishlisted(true);
-  } catch (error) {
-    console.error("Wishlist error:", error);
-    alert(error.message);
-  }
-};
+  };
 
   return (
     <div className="product-card">
@@ -132,18 +122,11 @@ const toggleWishlist = async () => {
           onClick={toggleWishlist}
           aria-label="Wishlist"
         >
-          {isWishlisted ? (
-            <FaHeart />
-          ) : (
-            <FaRegHeart />
-          )}
+          {isWishlisted ? <FaHeart /> : <FaRegHeart />}
         </button>
       </div>
 
-      <Link
-        to={`/product/${productId}`}
-        className="product-title"
-      >
+      <Link to={`/product/${productId}`} className="product-title">
         <h3>{product.title}</h3>
       </Link>
 
@@ -157,11 +140,7 @@ const toggleWishlist = async () => {
         ₹{product.price}
       </p>
 
-      <button
-        type="button"
-        onClick={addToCart}
-        className="add-cart-button"
-      >
+      <button type="button" onClick={addToCart} className="add-cart-button">
         Add to Cart
       </button>
     </div>
