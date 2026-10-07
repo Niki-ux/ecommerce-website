@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Toaster } from "react-hot-toast";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -16,31 +17,31 @@ import Orders from "./pages/Orders";
 function App() {
   return (
     <BrowserRouter>
+      {/* Toast container configuration */}
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 3000,
+          style: {
+            background: "#333",
+            color: "#fff",
+            borderRadius: "8px",
+            fontSize: "14px",
+          },
+        }}
+      />
+
       <Navbar />
 
       <Routes>
         <Route path="/" element={<Home />} />
-
         <Route path="/products" element={<Products />} />
-
-        <Route
-          path="/product/:id"
-          element={<ProductDetails />}
-        />
-
+        <Route path="/product/:id" element={<ProductDetails />} />
         <Route path="/cart" element={<Cart />} />
-
-        <Route
-          path="/wishlist"
-          element={<Wishlist />}
-        />
-
+        <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/login" element={<Login />} />
-
         <Route path="/signup" element={<Signup />} />
-
         <Route path="/profile" element={<Profile />} />
-
         <Route path="/orders" element={<Orders />} />
       </Routes>
 

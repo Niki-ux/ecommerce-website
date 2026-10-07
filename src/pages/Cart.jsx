@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 
 const API_URL = "http://localhost:5000/api/cart";
 
@@ -9,7 +10,7 @@ function Cart() {
     const token = localStorage.getItem("token");
 
     if (!token) {
-      alert("Please login first.");
+      toast.error("Please login first.");
       return;
     }
 
@@ -35,11 +36,11 @@ function Cart() {
       );
     }
 
-    alert("Order placed successfully!");
+    toast.success("Order placed successfully!");
 
   } catch (error) {
     console.error("Checkout error:", error);
-    alert(error.message);
+    toast.error(error.message);
   }
 };
   const [cart, setCart] = useState([]);

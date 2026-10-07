@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Login() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ function Login() {
     e.preventDefault();
 
     if (!email || !password) {
-      alert("Please enter your email and password.");
+      toast.error("Please enter your email and password.");
       return;
     }
 
@@ -36,7 +37,7 @@ function Login() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Login failed.");
+        toast.error(data.message || "Login failed.");
         return;
       }
 
@@ -44,11 +45,11 @@ function Login() {
       localStorage.setItem("user", JSON.stringify(data.user));
       window.dispatchEvent(new Event("authUpdated"));
 
-      alert("Login successful!");
+      toast.success("Login successful!");
 
       navigate("/");
     } catch (error) {
-      alert("Unable to connect to the server.");
+      toast.error("Unable to connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -57,21 +58,15 @@ function Login() {
   return (
     <main className="login-page">
       <div className="login-container">
-
         <div className="login-heading">
           <p>WELCOME BACK</p>
 
           <h1>Login</h1>
 
-          <span>
-            Sign in to continue to ZOVA.
-          </span>
+          <span>Sign in to continue to ZOVA.</span>
         </div>
 
-        <form
-          className="login-form"
-          onSubmit={handleLogin}
-        >
+        <form className="login-form" onSubmit={handleLogin}>
           <div className="form-group">
             <label>Email</label>
 
@@ -105,11 +100,8 @@ function Login() {
 
         <p className="login-footer">
           Don't have an account?{" "}
-          <Link to="/signup">
-            Sign up
-          </Link>
+          <Link to="/signup">Sign up</Link>
         </p>
-
       </div>
     </main>
   );
