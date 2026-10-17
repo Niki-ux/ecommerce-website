@@ -47,6 +47,25 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Original cart total before promo code discount
+    subtotal: {
+      type: Number,
+      default: 0,
+    },
+
+    // Applied Promo/Coupon Code (e.g. "ZOVA50")
+    couponCode: {
+      type: String,
+      default: null,
+    },
+
+    // Discount amount deducted via Promo Code
+    discountAmount: {
+      type: Number,
+      default: 0,
+    },
+
+    // Final payable amount after discount
     totalAmount: {
       type: Number,
       required: true,
