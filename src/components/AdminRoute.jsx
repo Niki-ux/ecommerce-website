@@ -1,10 +1,8 @@
 // src/components/AdminRoute.jsx
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext"; // Update this path to wherever your auth state lives
 
 const AdminRoute = ({ children }) => {
-  // Replace this with how you actually get the user in your app
-  // const { user } = useAuth(); 
+  // Getting user from localStorage instead of AuthContext
   const user = JSON.parse(localStorage.getItem("user")); 
 
   if (!user) {
