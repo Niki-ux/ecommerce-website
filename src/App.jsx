@@ -16,6 +16,9 @@ import Orders from "./pages/Orders";
 import AdminDashboard from './pages/AdminDashboard';
 import Checkout from './pages/Checkout';
 
+// Import the protected route wrapper
+import AdminRoute from "./components/AdminRoute";
+
 function App() {
   return (
     <BrowserRouter>
@@ -36,6 +39,7 @@ function App() {
       <Navbar />
 
       <Routes>
+        {/* Public Routes */}
         <Route path="/" element={<Home />} />
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<ProductDetails />} />
@@ -43,10 +47,21 @@ function App() {
         <Route path="/wishlist" element={<Wishlist />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
+        
+        {/* Customer Routes (You can create a <PrivateRoute> for these too if needed) */}
         <Route path="/profile" element={<Profile />} />
         <Route path="/orders" element={<Orders />} />
-        <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/checkout" element={<Checkout />} />
+
+        {/* Protected Admin Route */}
+        <Route 
+          path="/admin" 
+          element={
+            <AdminRoute>
+              <AdminDashboard />
+            </AdminRoute>
+          } 
+        />
       </Routes>
 
       <Footer />

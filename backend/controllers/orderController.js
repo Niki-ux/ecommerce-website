@@ -1,9 +1,10 @@
 import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
+import Coupon from "../models/Coupon.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { shippingAddress } = req.body;
+    const { shippingAddress, couponCode } = req.body;
 
     const cart = await Cart.findOne({
       user: req.user._id,
@@ -23,16 +24,44 @@ export const createOrder = async (req, res) => {
       image: item.product.image,
     }));
 
-    const totalAmount = items.reduce(
+    // Calculate initial subtotal
+    const subtotal = items.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
 
-    const order = await Order
-    .create({
+    let discountAmount = 0;
+    let finalTotal = subtotal;
+
+    // Server-side coupon validation and discount calculation
+    if (couponCode) {
+      const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
+      
+      // Check if coupon exists, is not expired, and meets minimum order amount
+      if (
+        coupon &&
+        new Date() <= new Date(coupon.expiryDate) &&
+        subtotal >= coupon.minOrderAmount
+      ) {
+        if (coupon.discountType === "PERCENTAGE") {
+          discountAmount = Math.round((subtotal * coupon.discountValue) / 100);
+        } else {
+          discountAmount = coupon.discountValue;
+        }
+        
+        // Ensure discount doesn't exceed the subtotal
+        discountAmount = Math.min(discountAmount, subtotal);
+        finalTotal = subtotal - discountAmount;
+      }
+    }
+
+    const order = await Order.create({
       user: req.user._id,
       items,
-      totalAmount,
+      subtotal,
+      couponCode: discountAmount > 0 ? couponCode : null, // Only save if actually applied
+      discountAmount,
+      totalAmount: finalTotal,
       shippingAddress,
     });
 
