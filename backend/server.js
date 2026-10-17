@@ -21,6 +21,8 @@ app.use("/api/products", productRoutes);
 app.use("/api/wishlist", wishlistRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/orders", orderRoutes);
+const couponRoutes = require('./routes/couponRoutes');
+app.use('/api/coupons', couponRoutes);
 
 app.get("/", (req, res) => {
   res.json({

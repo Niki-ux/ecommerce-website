@@ -28,7 +28,8 @@ export const createOrder = async (req, res) => {
       0
     );
 
-    const order = await Order.create({
+    const order = await Order
+    .create({
       user: req.user._id,
       items,
       totalAmount,
