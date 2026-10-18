@@ -303,6 +303,16 @@ function Navbar() {
 
                 <div className="profile-divider" />
 
+                {user?.role === "admin" && (
+                  <Link
+                    to="/admin"
+                    className="profile-menu-item"
+                    onClick={() => setProfileOpen(false)}
+                  >
+                    <span>⚡ Admin Dashboard</span>
+                  </Link>
+                )}
+
 
                 <Link
                   to="/profile"
@@ -476,6 +486,15 @@ function Navbar() {
           {isLoggedIn ? (
 
             <>
+
+              {user?.role === "admin" && (
+                <NavLink
+                  to="/admin"
+                  onClick={closeMenu}
+                >
+                  ⚡ Admin Dashboard
+                </NavLink>
+              )}
 
               <NavLink
                 to="/profile"
