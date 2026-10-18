@@ -1,46 +1,21 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Cart() {
-  // FIXED: Use environment variable instead of hardcoded localhost
-  const API_URL = `${import.meta.env.VITE_API_URL}/api/cart`;
+  const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = `${BASE_URL}/api/cart`;
 
-  const handleCheckout = async () => {
-    try {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        toast.error("Please login first.");
-        return;
-      }
-
-      // FIXED: Use environment variable instead of hardcoded localhost
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          shippingAddress: "IIT Jodhpur, Rajasthan",
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to create order");
-      }
-
-      toast.success("Order placed successfully!");
-      
-      // Auto-refresh the cart to show it is now empty after checkout
-      fetchCart();
-      
-    } catch (error) {
-      console.error("Checkout error:", error);
-      toast.error(error.message);
+  // Navigate to the Checkout page instead of bypassing it
+  const handleCheckout = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      toast.error("Please login first.");
+      navigate("/login");
+      return;
     }
+    navigate("/checkout");
   };
 
   const [cart, setCart] = useState([]);
