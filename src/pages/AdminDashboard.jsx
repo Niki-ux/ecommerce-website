@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import {
   BarChart,
   Bar,
@@ -10,7 +11,8 @@ import {
   CartesianGrid,
 } from 'recharts';
 
-const API_URL = 'http://localhost:5000/api/coupons';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = `${BASE_URL}/api/coupons`;
 
 const AdminDashboard = () => {
   const [stats, setStats] = useState({
@@ -56,8 +58,18 @@ const AdminDashboard = () => {
 
   const handleCreateCoupon = async (e) => {
     e.preventDefault();
+    setMessage('');
     try {
-      await axios.post(`${API_URL}/create`, formData);
+      const payload = {
+        code: formData.code.trim().toUpperCase(),
+        discountType: formData.discountType,
+        discountValue: Number(formData.discountValue),
+        minOrderAmount: Number(formData.minOrderAmount) || 0,
+        expiryDate: formData.expiryDate,
+      };
+
+      await axios.post(`${API_URL}/create`, payload);
+      toast.success('Coupon created successfully!');
       setMessage('Coupon created successfully!');
       setFormData({
         code: '',
@@ -68,15 +80,19 @@ const AdminDashboard = () => {
       });
       fetchCoupons();
     } catch (err) {
-      setMessage(err.response?.data?.message || 'Error creating coupon');
+      const errMsg = err.response?.data?.message || 'Error creating coupon';
+      toast.error(errMsg);
+      setMessage(errMsg);
     }
   };
 
   const handleDeleteCoupon = async (id) => {
     try {
       await axios.delete(`${API_URL}/${id}`);
+      toast.success('Coupon deleted');
       fetchCoupons();
     } catch (err) {
+      toast.error('Error deleting coupon');
       console.error('Error deleting coupon', err);
     }
   };
@@ -89,7 +105,7 @@ const AdminDashboard = () => {
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '2rem' }}>
         <div style={cardStyle}>
           <h4>Total Revenue</h4>
-          <h2>₹{stats.totalRevenue.toLocaleString()}</h2>
+          <h2>₹{(stats.totalRevenue || 0).toLocaleString('en-IN')}</h2>
         </div>
         <div style={cardStyle}>
           <h4>Total Orders</h4>
@@ -109,7 +125,7 @@ const AdminDashboard = () => {
       <div style={{ ...cardStyle, marginBottom: '2rem', height: '350px' }}>
         <h3 style={{ marginBottom: '1rem' }}>Monthly Revenue Overview</h3>
         <ResponsiveContainer width="100%" height="85%">
-          <BarChart data={stats.salesChartData.length ? stats.salesChartData : [{ name: 'Current', revenue: stats.totalRevenue }]}>
+          <BarChart data={stats.salesChartData?.length ? stats.salesChartData : [{ name: 'Current', revenue: stats.totalRevenue || 0 }]}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis />
@@ -124,7 +140,7 @@ const AdminDashboard = () => {
         {/* Create Promo Code Form */}
         <div style={cardStyle}>
           <h3 style={{ marginBottom: '1rem' }}>Create Promo Code</h3>
-          {message && <p style={{ color: '#4f46e5', fontWeight: 'bold' }}>{message}</p>}
+          {message && <p style={{ color: '#4f46e5', fontWeight: 'bold', marginBottom: '0.8rem' }}>{message}</p>}
           <form onSubmit={handleCreateCoupon} style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
             <input
               type="text"
@@ -144,6 +160,7 @@ const AdminDashboard = () => {
             </select>
             <input
               type="number"
+              min="1"
               placeholder="Discount Value (e.g. 20 for 20% or ₹20)"
               value={formData.discountValue}
               onChange={(e) => setFormData({ ...formData, discountValue: e.target.value })}
@@ -152,7 +169,8 @@ const AdminDashboard = () => {
             />
             <input
               type="number"
-              placeholder="Min Order Amount (₹)"
+              min="0"
+              placeholder="Min Order Amount (₹) - Optional"
               value={formData.minOrderAmount}
               onChange={(e) => setFormData({ ...formData, minOrderAmount: e.target.value })}
               style={inputStyle}

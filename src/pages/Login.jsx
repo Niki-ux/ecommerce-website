@@ -47,7 +47,12 @@ function Login() {
 
       toast.success("Login successful!");
 
-      navigate("/");
+      // Redirect directly to Admin Dashboard if user is admin
+      if (data.user?.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       toast.error("Unable to connect to the server.");
     } finally {

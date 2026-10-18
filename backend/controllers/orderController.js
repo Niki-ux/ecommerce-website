@@ -4,7 +4,15 @@ import Coupon from "../models/Coupon.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { shippingAddress, couponCode } = req.body;
+    let { shippingAddress, couponCode } = req.body;
+
+    // Convert object shippingAddress to string if needed
+    if (shippingAddress && typeof shippingAddress === "object") {
+      const { fullName, phone, address, city, state, postalCode } = shippingAddress;
+      shippingAddress = [fullName, phone, address, city, state, postalCode]
+        .filter(Boolean)
+        .join(", ");
+    }
 
     const cart = await Cart.findOne({
       user: req.user._id,
@@ -16,13 +24,15 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const items = cart.items.map((item) => ({
-      product: item.product._id,
-      title: item.product.title,
-      price: item.product.price,
-      quantity: item.quantity,
-      image: item.product.image,
-    }));
+    const items = cart.items
+      .filter((item) => item.product)
+      .map((item) => ({
+        product: item.product._id,
+        title: item.product.title,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image,
+      }));
 
     // Calculate initial subtotal
     const subtotal = items.reduce(
@@ -35,23 +45,25 @@ export const createOrder = async (req, res) => {
 
     // Server-side coupon validation and discount calculation
     if (couponCode) {
-      const coupon = await Coupon.findOne({ code: couponCode, isActive: true });
-      
-      // Check if coupon exists, is not expired, and meets minimum order amount
-      if (
-        coupon &&
-        new Date() <= new Date(coupon.expiryDate) &&
-        subtotal >= coupon.minOrderAmount
-      ) {
-        if (coupon.discountType === "PERCENTAGE") {
-          discountAmount = Math.round((subtotal * coupon.discountValue) / 100);
-        } else {
-          discountAmount = coupon.discountValue;
+      const coupon = await Coupon.findOne({
+        code: couponCode.trim().toUpperCase(),
+        isActive: true,
+      });
+
+      if (coupon) {
+        const expiryEnd = new Date(coupon.expiryDate);
+        expiryEnd.setHours(23, 59, 59, 999);
+
+        if (new Date() <= expiryEnd && subtotal >= coupon.minOrderAmount) {
+          if (coupon.discountType === "PERCENTAGE") {
+            discountAmount = Math.round((subtotal * coupon.discountValue) / 100);
+          } else {
+            discountAmount = coupon.discountValue;
+          }
+
+          discountAmount = Math.min(discountAmount, subtotal);
+          finalTotal = subtotal - discountAmount;
         }
-        
-        // Ensure discount doesn't exceed the subtotal
-        discountAmount = Math.min(discountAmount, subtotal);
-        finalTotal = subtotal - discountAmount;
       }
     }
 
@@ -59,10 +71,10 @@ export const createOrder = async (req, res) => {
       user: req.user._id,
       items,
       subtotal,
-      couponCode: discountAmount > 0 ? couponCode : null, // Only save if actually applied
+      couponCode: discountAmount > 0 ? couponCode.trim().toUpperCase() : null,
       discountAmount,
       totalAmount: finalTotal,
-      shippingAddress,
+      shippingAddress: shippingAddress || "",
     });
 
     cart.items = [];

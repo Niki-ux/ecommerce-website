@@ -57,7 +57,10 @@ export const validateCoupon = async (req, res) => {
       return res.status(404).json({ message: "Invalid promo code" });
     }
 
-    if (new Date() > new Date(coupon.expiryDate)) {
+    const expiryEnd = new Date(coupon.expiryDate);
+    expiryEnd.setHours(23, 59, 59, 999);
+
+    if (new Date() > expiryEnd) {
       return res.status(400).json({ message: "This promo code has expired" });
     }
 

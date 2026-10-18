@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
-const API_BASE = 'http://localhost:5000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_BASE = `${BASE_URL}/api`;
 
 const Checkout = () => {
   const navigate = useNavigate();
@@ -34,36 +36,34 @@ const Checkout = () => {
   const [placingOrder, setPlacingOrder] = useState(false);
   const [orderError, setOrderError] = useState('');
 
-  // Load Cart Items on Mount (from Backend or LocalStorage)
+  // Load Cart Items on Mount
   useEffect(() => {
     const fetchCart = async () => {
       try {
         const token = localStorage.getItem('token');
-        if (token) {
-          const { data } = await axios.get(`${API_BASE}/cart`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          const items = data.items || data || [];
-          setCartItems(items);
-          calculateSubtotal(items);
-        } else {
-          const localCart = JSON.parse(localStorage.getItem('cart')) || [];
-          setCartItems(localCart);
-          calculateSubtotal(localCart);
+        if (!token) {
+          toast.error('Please login to checkout');
+          navigate('/login');
+          return;
         }
+        const { data } = await axios.get(`${API_BASE}/cart`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const items = data.items || [];
+        setCartItems(items);
+        calculateSubtotal(items);
       } catch (err) {
-        const localCart = JSON.parse(localStorage.getItem('cart')) || [];
-        setCartItems(localCart);
-        calculateSubtotal(localCart);
+        console.error('Failed to load cart:', err);
+        toast.error('Failed to load cart items');
       }
     };
     fetchCart();
-  }, []);
+  }, [navigate]);
 
   const calculateSubtotal = (items) => {
     const total = items.reduce((sum, item) => {
-      const price = item.product?.price || item.price || 0;
-      const qty = item.quantity || 1;
+      const price = Number(item.product?.price || item.price || 0);
+      const qty = Number(item.quantity || 1);
       return sum + price * qty;
     }, 0);
     setCartTotal(total);
@@ -74,16 +74,18 @@ const Checkout = () => {
     if (!promoCode.trim()) return;
     setPromoLoading(true);
     setPromoError('');
-
     try {
       const { data } = await axios.post(`${API_BASE}/coupons/apply`, {
-        code: promoCode,
+        code: promoCode.trim().toUpperCase(),
         cartTotal,
       });
       setDiscountData(data);
+      toast.success(data.message || 'Promo code applied!');
     } catch (err) {
       setDiscountData(null);
-      setPromoError(err.response?.data?.message || 'Invalid promo code');
+      const msg = err.response?.data?.message || 'Invalid promo code';
+      setPromoError(msg);
+      toast.error(msg);
     } finally {
       setPromoLoading(false);
     }
@@ -93,6 +95,7 @@ const Checkout = () => {
     setPromoCode('');
     setDiscountData(null);
     setPromoError('');
+    toast.success('Promo code removed');
   };
 
   // --- PLACE ORDER HANDLER ---
@@ -111,31 +114,27 @@ const Checkout = () => {
 
     try {
       const token = localStorage.getItem('token');
+
+      // Format shippingAddress as a clean String to match Order.js schema
+      const formattedAddress = `${shippingAddress.fullName}, ${shippingAddress.phone}, ${shippingAddress.address}, ${shippingAddress.city}, ${shippingAddress.state} - ${shippingAddress.postalCode}`;
+
       const orderPayload = {
-        items: cartItems.map((item) => ({
-          product: item.product?._id || item._id,
-          name: item.product?.name || item.name,
-          price: item.product?.price || item.price,
-          quantity: item.quantity || 1,
-          image: item.product?.image || item.image,
-        })),
-        shippingAddress,
+        shippingAddress: formattedAddress,
         paymentMethod,
-        subtotal: cartTotal,
         couponCode: discountData ? discountData.code : null,
-        discountAmount: discountAmount,
-        totalAmount: finalPayable,
       };
 
       await axios.post(`${API_BASE}/orders`, orderPayload, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
+        headers: { Authorization: `Bearer ${token}` },
       });
 
       localStorage.removeItem('cart');
-      alert(`Order Placed Successfully! Final Paid: ₹${finalPayable}`);
-      navigate('/');
+      toast.success(`Order Placed Successfully! Final Paid: ₹${finalPayable}`);
+      navigate('/orders');
     } catch (err) {
-      setOrderError(err.response?.data?.message || 'Error placing order. Please try again.');
+      const msg = err.response?.data?.message || 'Error placing order. Please try again.';
+      setOrderError(msg);
+      toast.error(msg);
     } finally {
       setPlacingOrder(false);
     }
@@ -244,12 +243,12 @@ const Checkout = () => {
           {/* Cart Items List */}
           <div style={{ maxHeight: '240px', overflowY: 'auto', marginBottom: '1rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
             {cartItems.map((item, idx) => {
-              const name = item.product?.name || item.name;
-              const price = item.product?.price || item.price || 0;
-              const qty = item.quantity || 1;
+              const title = item.product?.title || item.product?.name || item.title || item.name || 'Product';
+              const price = Number(item.product?.price || item.price || 0);
+              const qty = Number(item.quantity || 1);
               return (
                 <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.6rem', fontSize: '0.95rem' }}>
-                  <span>{name} × {qty}</span>
+                  <span>{title} × {qty}</span>
                   <span style={{ fontWeight: '600' }}>₹{price * qty}</span>
                 </div>
               );
@@ -290,7 +289,6 @@ const Checkout = () => {
                 </button>
               )}
             </div>
-
             {promoError && <p style={{ color: '#dc2626', fontSize: '0.85rem', marginTop: '0.5rem' }}>{promoError}</p>}
             {discountData && (
               <p style={{ color: '#16a34a', fontSize: '0.88rem', fontWeight: '600', marginTop: '0.5rem' }}>
@@ -305,19 +303,16 @@ const Checkout = () => {
               <span>Subtotal</span>
               <span>₹{cartTotal}</span>
             </div>
-
             {discountData && (
               <div style={{ display: 'flex', justifyContent: 'space-between', color: '#16a34a', fontWeight: '600' }}>
                 <span>Discount ({discountData.code})</span>
                 <span>-₹{discountData.discountAmount}</span>
               </div>
             )}
-
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <span>Shipping</span>
               <span style={{ color: '#16a34a' }}>FREE</span>
             </div>
-
             <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '2px solid #111', paddingTop: '0.8rem', marginTop: '0.4rem', fontSize: '1.2rem', fontWeight: 'bold' }}>
               <span>Total Payable</span>
               <span>₹{finalPayable}</span>
