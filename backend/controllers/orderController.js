@@ -1,9 +1,18 @@
 import Order from "../models/Order.js";
 import Cart from "../models/Cart.js";
+import Coupon from "../models/Coupon.js";
 
 export const createOrder = async (req, res) => {
   try {
-    const { shippingAddress } = req.body;
+    let { shippingAddress, couponCode } = req.body;
+
+    // Convert object shippingAddress to string if needed
+    if (shippingAddress && typeof shippingAddress === "object") {
+      const { fullName, phone, address, city, state, postalCode } = shippingAddress;
+      shippingAddress = [fullName, phone, address, city, state, postalCode]
+        .filter(Boolean)
+        .join(", ");
+    }
 
     const cart = await Cart.findOne({
       user: req.user._id,
@@ -15,24 +24,57 @@ export const createOrder = async (req, res) => {
       });
     }
 
-    const items = cart.items.map((item) => ({
-      product: item.product._id,
-      title: item.product.title,
-      price: item.product.price,
-      quantity: item.quantity,
-      image: item.product.image,
-    }));
+    const items = cart.items
+      .filter((item) => item.product)
+      .map((item) => ({
+        product: item.product._id,
+        title: item.product.title,
+        price: item.product.price,
+        quantity: item.quantity,
+        image: item.product.image,
+      }));
 
-    const totalAmount = items.reduce(
+    // Calculate initial subtotal
+    const subtotal = items.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
 
+    let discountAmount = 0;
+    let finalTotal = subtotal;
+
+    // Server-side coupon validation and discount calculation
+    if (couponCode) {
+      const coupon = await Coupon.findOne({
+        code: couponCode.trim().toUpperCase(),
+        isActive: true,
+      });
+
+      if (coupon) {
+        const expiryEnd = new Date(coupon.expiryDate);
+        expiryEnd.setHours(23, 59, 59, 999);
+
+        if (new Date() <= expiryEnd && subtotal >= coupon.minOrderAmount) {
+          if (coupon.discountType === "PERCENTAGE") {
+            discountAmount = Math.round((subtotal * coupon.discountValue) / 100);
+          } else {
+            discountAmount = coupon.discountValue;
+          }
+
+          discountAmount = Math.min(discountAmount, subtotal);
+          finalTotal = subtotal - discountAmount;
+        }
+      }
+    }
+
     const order = await Order.create({
       user: req.user._id,
       items,
-      totalAmount,
-      shippingAddress,
+      subtotal,
+      couponCode: discountAmount > 0 ? couponCode.trim().toUpperCase() : null,
+      discountAmount,
+      totalAmount: finalTotal,
+      shippingAddress: shippingAddress || "",
     });
 
     cart.items = [];

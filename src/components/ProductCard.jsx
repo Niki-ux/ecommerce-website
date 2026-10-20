@@ -1,12 +1,13 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaRegHeart, FaHeart } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 export default function ProductCard({ product }) {
   const productId = product._id || product.id;
 
   const [isAdded, setIsAdded] = useState(false);
-  const [toastMessage, setToastMessage] = useState("");
 
   const [isWishlisted, setIsWishlisted] = useState(() => {
     const wishlist =
@@ -27,44 +28,45 @@ export default function ProductCard({ product }) {
     return () => window.clearTimeout(timer);
   }, [isAdded]);
 
-  useEffect(() => {
-    if (!toastMessage) return;
+  const addToCart = async () => {
+    try {
+      const token = localStorage.getItem("token");
 
-    const timer = window.setTimeout(() => {
-      setToastMessage("");
-    }, 2600);
+      if (!token) {
+        toast.error("Please login first.");
+        return;
+      }
 
-    return () => window.clearTimeout(timer);
-  }, [toastMessage]);
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/cart`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            productId,
+            quantity: 1,
+          }),
+        }
+      );
 
-  const addToCart = () => {
-    const existingCart =
-      JSON.parse(localStorage.getItem("cart")) || [];
+      const data = await response.json();
 
-    const existingProduct = existingCart.find(
-      (item) => (item._id || item.id) === productId
-    );
+      if (!response.ok) {
+        throw new Error(
+          data.message || "Failed to add product to cart"
+        );
+      }
 
-    const updatedCart = existingProduct
-      ? existingCart.map((item) =>
-          (item._id || item.id) === productId
-            ? {
-                ...item,
-                quantity: (item.quantity || 1) + 1,
-              }
-            : item
-        )
-      : [
-          ...existingCart,
-          { ...product, quantity: 1 },
-        ];
-
-    localStorage.setItem("cart", JSON.stringify(updatedCart));
-
-    window.dispatchEvent(new Event("cartUpdated"));
-
-    setIsAdded(true);
-    setToastMessage(`${product.title} added to your bag`);
+      setIsAdded(true);
+      toast.success(`${product.title} added to your bag!`);
+      window.dispatchEvent(new Event("cartUpdated"));
+    } catch (error) {
+      console.error("Add to cart error:", error);
+      toast.error(error.message || "Unable to add product to cart");
+    }
   };
 
   const toggleWishlist = async () => {
@@ -72,13 +74,13 @@ export default function ProductCard({ product }) {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        alert("Please login first.");
+        toast.error("Please login first.");
         return;
       }
 
       if (isWishlisted) {
         const response = await fetch(
-          `http://localhost:5000/api/wishlist/${productId}`,
+          `${import.meta.env.VITE_API_URL}/api/wishlist/${productId}`,
           {
             method: "DELETE",
             headers: {
@@ -98,11 +100,12 @@ export default function ProductCard({ product }) {
 
         setIsWishlisted(false);
         window.dispatchEvent(new Event("wishlistUpdated"));
+        toast.success("Removed from wishlist");
         return;
       }
 
       const response = await fetch(
-        "http://localhost:5000/api/wishlist",
+        `${import.meta.env.VITE_API_URL}/api/wishlist`,
         {
           method: "POST",
           headers: {
@@ -123,9 +126,10 @@ export default function ProductCard({ product }) {
 
       setIsWishlisted(true);
       window.dispatchEvent(new Event("wishlistUpdated"));
+      toast.success("Added to wishlist!");
     } catch (error) {
       console.error("Wishlist error:", error);
-      alert(error.message);
+      toast.error(error.message || "Wishlist update failed");
     }
   };
 
@@ -174,13 +178,6 @@ export default function ProductCard({ product }) {
       >
         {isAdded ? "ADDED ✓" : "ADD TO BAG"}
       </button>
-
-      {toastMessage && (
-        <div className="zova-cart-toast" role="status">
-          <span className="zova-cart-toast-icon">✓</span>
-          <span>{toastMessage}</span>
-        </div>
-      )}
     </div>
   );
 }

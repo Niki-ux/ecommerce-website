@@ -1,47 +1,23 @@
 import React, { useEffect, useState } from "react";
-
-const API_URL = "http://localhost:5000/api/cart";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 function Cart() {
+  const navigate = useNavigate();
+  const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+  const API_URL = `${BASE_URL}/api/cart`;
 
-  const handleCheckout = async () => {
-  try {
+  // Navigate to the Checkout page instead of bypassing it
+  const handleCheckout = () => {
     const token = localStorage.getItem("token");
-
     if (!token) {
-      alert("Please login first.");
+      toast.error("Please login first.");
+      navigate("/login");
       return;
     }
+    navigate("/checkout");
+  };
 
-    const response = await fetch(
-      "http://localhost:5000/api/orders",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          shippingAddress: "IIT Jodhpur, Rajasthan",
-        }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(
-        data.message || "Failed to create order"
-      );
-    }
-
-    alert("Order placed successfully!");
-
-  } catch (error) {
-    console.error("Checkout error:", error);
-    alert(error.message);
-  }
-};
   const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -198,8 +174,7 @@ function Cart() {
     const product = item.product;
 
     return (
-      sum +
-      Number(product?.price || 0) * Number(item.quantity || 1)
+      sum + Number(product?.price || 0) * Number(item.quantity || 1)
     );
   }, 0);
 
@@ -300,9 +275,7 @@ function Cart() {
                 }}
               >
                 <button
-                  onClick={() =>
-                    decreaseQuantity(productId, quantity)
-                  }
+                  onClick={() => decreaseQuantity(productId, quantity)}
                   disabled={quantity <= 1}
                 >
                   −
@@ -310,11 +283,7 @@ function Cart() {
 
                 <span>{quantity}</span>
 
-                <button
-                  onClick={() =>
-                    increaseQuantity(productId, quantity)
-                  }
-                >
+                <button onClick={() => increaseQuantity(productId, quantity)}>
                   +
                 </button>
               </div>
@@ -348,12 +317,9 @@ function Cart() {
         }}
       >
         <h2>Total: ₹{total.toFixed(2)}</h2>
-        <button
-  className="checkout-button"
-  onClick={handleCheckout}
->
-  Checkout
-</button>
+        <button className="checkout-button" onClick={handleCheckout}>
+          Checkout
+        </button>
         <button
           onClick={clearCart}
           style={{

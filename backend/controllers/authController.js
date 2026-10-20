@@ -2,9 +2,9 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 
-const generateToken = (userId) => {
+const generateToken = (userId, role = "user") => {
   return jwt.sign(
-    { userId },
+    { userId, role },
     process.env.JWT_SECRET,
     { expiresIn: "7d" }
   );
@@ -34,9 +34,10 @@ export const registerUser = async (req, res) => {
       name,
       email,
       password: hashedPassword,
+      role: "user",
     });
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.role);
 
     res.status(201).json({
       message: "Registration successful",
@@ -45,6 +46,7 @@ export const registerUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -65,6 +67,40 @@ export const loginUser = async (req, res) => {
       });
     }
 
+    // ==========================================
+    // HARDCODED ADMIN CREDENTIALS CHECK
+    // ==========================================
+    if (email.toLowerCase() === "admin@zova.com" && password === "admin123") {
+      let adminUser = await User.findOne({ email: "admin@zova.com" });
+
+      if (!adminUser) {
+        const hashedPassword = await bcrypt.hash("admin123", 10);
+        adminUser = await User.create({
+          name: "ZOVA Admin",
+          email: "admin@zova.com",
+          password: hashedPassword,
+          role: "admin",
+        });
+      } else if (adminUser.role !== "admin") {
+        adminUser.role = "admin";
+        await adminUser.save();
+      }
+
+      const token = generateToken(adminUser._id, "admin");
+
+      return res.json({
+        message: "Admin login successful",
+        token,
+        user: {
+          id: adminUser._id,
+          name: adminUser.name,
+          email: adminUser.email,
+          role: "admin",
+        },
+      });
+    }
+
+    // Standard Database User Check
     const user = await User.findOne({ email });
 
     if (!user) {
@@ -81,7 +117,7 @@ export const loginUser = async (req, res) => {
       });
     }
 
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.role);
 
     res.json({
       message: "Login successful",
@@ -90,6 +126,7 @@ export const loginUser = async (req, res) => {
         id: user._id,
         name: user.name,
         email: user.email,
+        role: user.role || "user",
       },
     });
   } catch (error) {

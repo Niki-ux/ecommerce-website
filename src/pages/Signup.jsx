@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
 
 function Signup() {
   const navigate = useNavigate();
@@ -13,7 +14,7 @@ function Signup() {
     e.preventDefault();
 
     if (!name || !email || !password) {
-      alert("Please fill all fields.");
+      toast.error("Please fill all fields.");
       return;
     }
 
@@ -28,9 +29,9 @@ function Signup() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            name,
-            email,
-            password,
+             name,
+             email,
+             password,
           }),
         }
       );
@@ -38,7 +39,7 @@ function Signup() {
       const data = await response.json();
 
       if (!response.ok) {
-        alert(data.message || "Registration failed.");
+        toast.error(data.message || "Registration failed.");
         return;
       }
 
@@ -46,11 +47,11 @@ function Signup() {
       localStorage.setItem("user", JSON.stringify(data.user));
       window.dispatchEvent(new Event("authUpdated"));
 
-      alert("Account created successfully!");
+      toast.success("Account created successfully!");
 
       navigate("/");
     } catch (error) {
-      alert("Unable to connect to the server.");
+      toast.error("Unable to connect to the server.");
     } finally {
       setLoading(false);
     }
@@ -59,24 +60,15 @@ function Signup() {
   return (
     <main className="login-page">
       <div className="login-container">
-
         <div className="login-heading">
           <p>WELCOME TO ZOVA</p>
-
           <h1>Sign Up</h1>
-
-          <span>
-            Create your account to get started.
-          </span>
+          <span>Create your account to get started.</span>
         </div>
 
-        <form
-          className="login-form"
-          onSubmit={handleSignup}
-        >
+        <form className="login-form" onSubmit={handleSignup}>
           <div className="form-group">
             <label>Name</label>
-
             <input
               type="text"
               placeholder="Enter your name"
@@ -87,7 +79,6 @@ function Signup() {
 
           <div className="form-group">
             <label>Email</label>
-
             <input
               type="email"
               placeholder="Enter your email"
@@ -98,7 +89,6 @@ function Signup() {
 
           <div className="form-group">
             <label>Password</label>
-
             <input
               type="password"
               placeholder="Create a password"
@@ -117,12 +107,8 @@ function Signup() {
         </form>
 
         <p className="login-footer">
-          Already have an account?{" "}
-          <Link to="/login">
-            Login
-          </Link>
+          Already have an account? <Link to="/login">Login</Link>
         </p>
-
       </div>
     </main>
   );
