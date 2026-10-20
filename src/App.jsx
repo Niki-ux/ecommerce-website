@@ -8,6 +8,7 @@ import Products from "./pages/Products";
 import ProductDetails from "./pages/ProductDetails";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
+import AnnouncementBar from "./components/AnnouncementBar";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
@@ -16,6 +17,7 @@ import Orders from "./pages/Orders";
 function App() {
   return (
     <BrowserRouter>
+      <AnnouncementBar />
       <Navbar />
 
       <Routes>

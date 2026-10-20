@@ -5109,3 +5109,92 @@ img {
   }
 
 }
+
+/* ZOVA moving offers bar */
+.announcement-bar {
+  width: 100%;
+  height: 32px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  background: #25211f;
+  color: #fff8f0;
+  white-space: nowrap;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 1.4px;
+}
+
+.announcement-track {
+  display: flex;
+  width: max-content;
+  animation: zova-offer-scroll 24s linear infinite;
+}
+
+.announcement-group {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.announcement-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  padding-left: 24px;
+}
+
+.announcement-star {
+  color: #f29a72;
+  margin-left: 24px;
+}
+
+@keyframes zova-offer-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .announcement-track {
+    animation: none;
+  }
+}
+
+.zova-cart-toast {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 20px;
+  background: #25211f;
+  color: #fff8f0;
+  border: 1px solid #f29a72;
+  border-radius: 8px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+  font-size: 14px;
+  animation: zova-toast-in 0.25s ease-out;
+}
+
+.zova-cart-toast-icon {
+  color: #f29a72;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+@keyframes zova-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
